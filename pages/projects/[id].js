@@ -1,35 +1,42 @@
-import { getProject, getAllProjects } from '../../lib/api'
+import Head from "next/head";
+import { getProject, getAllProjects } from "../../lib/api";
+import Layout from "../../components/layout";
+import Container from "../../components/container";
+import projectStyles from "./project.module.css";
 
-const Project = ({id, html}) => {
+const Project = ({ title, description, html }) => {
   return (
-    <>
-      <h1>Project {id}</h1>
-      <div dangerouslySetInnerHTML={{__html: html}} />
-    </>
+    <Layout title={title} breadcrumb>
+      <Container>
+        <Head title={`${title}`} htmlAttributes={{ lang: "en" }} />
+        {description && (
+          <p className={projectStyles.description}>{description}</p>
+        )}
+      </Container>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </Layout>
   );
 };
 
-export async function getStaticProps({ params: { id }}) {
-  const html = await getProject(id);
-  console.log('html', html)
+export const getStaticProps = async ({ params: { id } }) => {
+  const project = await getProject(id);
   return {
     props: {
-      id,
-      html
+      ...project,
     },
   };
-}
+};
 
-export async function getStaticPaths() {
-  const projects = await getAllProjects()
+export const getStaticPaths = async () => {
+  const projects = await getAllProjects();
   const paths = projects.map((id) => ({
     params: { id },
-  }))
+  }));
 
   return {
     paths,
     fallback: false,
   };
-}
+};
 
 export default Project;
