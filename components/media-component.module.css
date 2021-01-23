@@ -1,0 +1,58 @@
+ .mediaContainer {
+  position: relative;
+}
+
+.media {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(100, 100, 100, 0.5);
+  line-height: 0;
+}
+
+.mediaAsset {
+  cursor: zoom-in;
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  width: auto;
+}
+
+.isExpanded {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  z-index: 3;
+} 
+
+.isTransitioning {
+  z-index: 3;
+}
+
+.mediaAsset {
+  cursor: zoom-in;
+  max-width: 100%;
+  height: auto;
+}
+
+.video {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-top: calc(100% * (664/374));
+  border: 2px solid var(--color-grey-dark);
+}
+
+.video video {
+  display: block;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}

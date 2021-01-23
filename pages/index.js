@@ -1,65 +1,117 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React from "react";
+import Link from "next/link";
+import Head from "next/head";
+import { format } from 'date-fns';
+import Layout from "../components/layout";
+import Container from "../components/container";
+import TwoUp from "../components/two-up";
+import styles from "./index.module.css";
+import {getRoles} from '../lib/api';
 
-export default function Home() {
+const formatDate = (date) => {
+  if(!date) return null;
+  return format(new Date(date), 'MMM yyyy')
+};
+
+const RootIndex = ({ roles }) => {
+  const headerTitle = (
+    <>
+      Front-end developer.
+      <br />I build things for <span>people</span>.
+    </>
+  );
+  const headerLink = {
+    url: "/about",
+    text: "About me",
+  };
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+    <Layout title={headerTitle} link={headerLink}>
+      <Container>
+        <Head
+          title="Dan Laush | Front-end developer."
+          htmlAttributes={{ lang: "en" }}
         >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
-}
+          <meta name="description" content="I build things for people." />
+        </Head>
+        <TwoUp title="Work">
+          <ul className={styles.projectsList}>
+            <li>
+              <Link href="/projects/our-watch">
+                <a className="link">Our Watch</a>
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript, Vue, WordPress, Static site <span>2019</span>
+              </p>
+            </li>
+            <li>
+              <Link href="/projects/worksafe">
+                <a className="link">WorkSafe</a>
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript, Vue, Drupal <span>2018</span>
+              </p>
+            </li>
+            <li>
+              <Link href="/projects/side-projects">
+                <a className="link">Side projects</a>
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript <span>2018</span>
+              </p>
+            </li>
+            <li>
+              <Link href="/projects/talks">
+                <a className="link">Talks</a>
+              </Link>
+              <p className={styles.projectsListMeta}>Public speaking</p>
+            </li>
+          </ul>
+        </TwoUp>
+
+        <TwoUp title="Resume" pdf>
+          {roles.map(
+            ({
+              id,
+              entryTitle,
+              url,
+              organisation,
+              startDate,
+              endDate,
+              skillsLearned,
+            }) => (
+              <React.Fragment key={id}>
+                <h3>{entryTitle}</h3>
+                <p className={styles.roleMeta}>
+                  <a className={styles.roleLink} href={url}>
+                    {organisation}
+                  </a>
+                  &nbsp;<span className={styles.roleDuration}>{formatDate(startDate)}—{formatDate(endDate)}</span>
+                </p>
+                <div
+                  className={styles.roleDetails}
+                  dangerouslySetInnerHTML={{
+                    __html: skillsLearned,
+                  }}
+                />
+              </React.Fragment>
+            )
+          )}
+          <h3>See complete resume</h3>
+          <a href="/Laush-resume.pdf">Download full history (PDF)</a>
+        </TwoUp>
+      </Container>
+    </Layout>
+  );
+};
+
+export const getStaticProps = async () => {
+  const roles = await getRoles();
+  return {
+    props: {
+      roles,
+    },
+  };
+};
+
+export default RootIndex;

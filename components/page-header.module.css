@@ -1,0 +1,82 @@
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  order: 3;
+  margin-top: 1rem;
+  margin-bottom: 0;
+  font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+  font-weight: 300;
+  font-size: 2rem;
+  line-height: 1.25;
+  letter-spacing: -0.05em;
+}
+
+@media screen and (min-width: 768px) {
+  .title {
+    margin-top: 2rem;
+    font-size: 3rem;
+    line-height: 1.25;
+    letter-spacing: -0.05em;
+  }
+}
+
+.title span {
+  color: var(--color-highlight);
+}
+
+.name {
+  order: 1;
+  margin-top: 4.5rem;
+  margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+  .name {
+    margin-top: 9.1rem;
+    margin-bottom: 6.7rem;
+  }
+}
+
+.nameLink {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+}
+
+@media screen and (min-width: 768px) {
+  .nameLink {
+    font-size: 1.75rem;
+  }
+}
+
+.link {
+  order: 4;
+  margin-top: 1.7rem;
+  margin-bottom: 0;
+}
+
+.link a,
+.breadcrumb a {
+  font-size: 1.25rem;
+  line-height: 1.16;
+  /* identical to box height, or 117% */
+  letter-spacing: -0.01em;
+}
+
+@media screen and (min-width: 768px) {
+  .link a,
+  .breadcrumb a {
+    font-size: 1.5rem;
+  }
+}
+
+.breadcrumb {
+  order: 2;
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
