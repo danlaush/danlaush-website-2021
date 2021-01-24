@@ -1,0 +1,46 @@
+import Project from '../../components/project';
+import Container from '../../components/container';
+import TwoUp from '../../components/two-up';
+
+<Project
+  title="Our Watch"
+  description="Helped a non-profit on their mission to change the conversation around violence against women with a family of static sites.">
+<Container>
+<TwoUp title="Project, in brief">
+
+- Domestic violence research group pursuing nationwide behavioural change
+- Needed to create "hub" sites about particular topics with shared resources across the family of sites
+  - Main Website
+  - [Workplace Equality and Respect hub](https://workplace.ourwatch.org.au/)
+- __Project deliverables__
+  - Nuxt application to static generate each hub site
+  - A Single-Page Application "preview" mode for content editors to see the site with data direct from the CMS
+  - Modular site design to easily support new web properties
+  - WordPress multi-site as a headless CMS, with shared media library and ACF data models
+
+</TwoUp>
+<TwoUp title="My role">
+
+- Led development of Nuxt front-end application
+- Worked with digital designer who built static templates in HTML/CSS
+  - Converted static components to dynamic components in the Vue app
+  - Advised on accessibility of digital designs
+- Coordinated with developers of CMS+API and DevOps/deployment workflow
+
+</TwoUp>
+<TwoUp title="Learnings/notes">
+
+- Working with a digital designer was excellent. I was able to focus on business logic and the designer made sure the web reflected their design vision, without the intermediary flat design file.
+- Static sites are faaaaaast
+- Static sites from a CMS
+- Used a Nuxt plugin written by a colleague
+  - Get all routes stored in the CMS with a custom WordPress API endpoint
+  - Run this list of routes through nuxt generate
+  - Every time an API request is made, create a JSON file of the response
+  - When the static site makes an API request, it fetches from the static-deployed JSON file instead of the API
+- Static sites add resilience for users because the site can't really go down or get hacked easily.
+- However, it's still a new thing for agencies. Much of the build tooling, especially for our multi-site situation, was custom. This could make it more challenging to come back to later on.
+
+</TwoUp>
+</Container>
+</Project>
