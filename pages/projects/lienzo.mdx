@@ -1,11 +1,18 @@
 import Project from '../../components/project';
 import Container from '../../components/container';
 import TwoUp from '../../components/two-up';
+import { Media, MediaSection } from '../../components/media';
 
 <Project
-  title="Lienzo"
+  title="TransferWise CMS refresh"
   description="I initiated and led a project to share exciting, engaging messages with potential customers by separating the frontend and backend of TransferWise’s marketing CMS. This made it easier for developers to contribute new widgets and improved the editor's experience, as well as freshened up the design of landing pages with the latest from the company design system.">
 <Container>
+<MediaSection
+  src="/media/lienzo/paypal-calculator-desktop.png"
+  alt="PayPal fee calculator page"
+  width={2732}
+  height={2048}
+/>
 <TwoUp title="Context">
 
 The custom in-house marketing CMS at TransferWise, Lienzo, made it difficult to share exciting, engaging messages with potential customers.
@@ -17,6 +24,13 @@ It was originally created to quickly scaffold landing pages for SEO experiments,
 It could not server-side render React components, so pages created with Lienzo could not easily integrate common UI components shared across the company in an SEO-friendly way.
 
 </TwoUp>
+<MediaSection
+  src="/media/lienzo/travel-money.png"
+  alt="Travel Money comparison page"
+  width={2880}
+  height={1800}
+  caption="A bespoke landing page showing customers how much they could save over buying Travel Money cash from a retailer."
+/>
 <TwoUp title="Outcomes">
 
 ### Next.js frontend for a headless CMS
@@ -35,9 +49,16 @@ The new frontend lowered the barrier of entry for TransferWise developers to add
 **Example:**
 The High Amount Transfers team launched a new volume-based discount feature, and designed an interactive slider so customers could explore how much they would save. They wanted to showcase this component on a marketing page, but on the old Lienzo frontend pages were limited to existing widgets. Before we introduced them to the new frontend, the developers had planned to make a new Next.js app and recreate several widgets already existing in Lienzo just for this page.
 
-__[pictures/videos of special widgets]__
+<Media
+  src="/media/lienzo/monthly-volume-discount.png"
+  alt="PayPal fee calculator page"
+  width={2880}
+  height={1800}
+  sizes="calc(100vw-3rem), (min-width: 768px) 40rem"
+  caption="The Monthly Volume Discount landing page"
+/>
 
-Instead, the product owner used the CMS to manage 90% of the landing page with existing widgets, leaving their engineers to focus their energy on the key feature, with none of the long term maintenance responsibilities of creating a new app.
+Instead, they used the CMS to manage 90% of the landing page with existing widgets. This gave their engineers time to focus on the key feature, with none of the long term maintenance responsibilities of creating a new app.
 
 The JavaScript codebase keeps bespoke code isolated and makes the dependency chain more explicit, which will keep the codebase healthy over the long term. The legacy frontend used a traditional setup of CSS classes in template files to trigger JS behaviour defined elsewhere in the codebase, which led to difficulty troubleshooting complex issues.
 
@@ -47,7 +68,14 @@ Conventions for widget-building were well-documented, and were designed for deve
 
 Another challenge to storytelling on Lienzo was the editors' experience. The "edit page" view was a series of text inputs and select boxes, and without a revision or draft system the editor had to mentally visualise the changes they were making, then publish blindly. There was a limited preview system which only worked for new, pre-published pages. Once the page was live, the editor had to know which widget they wanted to add based on its name.
 
-__[picture/video of preview experience]__
+<Media
+  src="/media/lienzo/preview-mode.png"
+  alt="Size-by-side view of the edit screen and what that configuration looks like in the new frontend"
+  width={2560}
+  height={1343}
+  sizes="calc(100vw-3rem), (min-width: 768px) 40rem"
+  caption="The editor's new preview mode"
+/>
 
 To solve this, I created a `/preview` route in Next.js and embedded it in the edit view as an iframe. When content or config changed in the edit view, it would push new data into the preview pane with the `postMessage()` API, rendering the page as the editor works on it. The result was a fluid experience that allowed editors to experiment and design in a more intuitive way.
 

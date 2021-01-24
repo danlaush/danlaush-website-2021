@@ -35,7 +35,7 @@ const RootIndex = ({ roles }) => {
           <ul className={styles.projectsList}>
             <li>
               <Link href="/projects/lienzo">
-                <a className="link">Lienzo</a>
+                <a className="link">TransferWise CMS refresh</a>
               </Link>
               <p className={styles.projectsListMeta}>
                 JavaScript, Next.js, React <span>2020</span>
