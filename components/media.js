@@ -10,6 +10,10 @@ const Media = ({src, alt, width, height, caption}) => (
         width={width}
         height={height}
         layout="responsive"
+        sizes="
+          calc(100vw - 3rem),
+          (min-width: 67rem) 64rem
+        "
         />
     </div>
     <p className={styles.caption}>{caption}</p>
