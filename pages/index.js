@@ -34,6 +34,14 @@ const RootIndex = ({ roles }) => {
         <TwoUp title="Work">
           <ul className={styles.projectsList}>
             <li>
+              <Link href="/projects/lienzo">
+                <a className="link">Lienzo</a>
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript, Next.js, React <span>2020</span>
+              </p>
+            </li>
+            <li>
               <Link href="/projects/our-watch">
                 <a className="link">Our Watch</a>
               </Link>
