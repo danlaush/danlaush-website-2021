@@ -6,9 +6,46 @@ import TwoUp from '../../components/two-up';
   title="Worksafe"
   description="Modernised WorkSafe Victoria's web presence to help achieve their goal of getting Victorian workers home safely.">
 <Container>
-<TwoUp title="Title">
+<TwoUp title="Project, in brief">
 
-Content
+- [Modernised WorkSafe Victoria's web presence](https://www.worksafe.vic.gov.au "Visit the WorkSafe Victoria website")
+  - Let's get Victorian workers home safely
+- __Project deliverables__
+  - User research and digital service design
+  - [Design system & component library development](https://todaydesign.github.io/worksafe-frontend/ "Visit the WorkSafe component library (Storybook)")
+	  - Distributed on npm*, documented in Storybook
+  - Headless <code>{JSON:API}</code> Drupal CMS, built for sharing content across sites
+  - 2 [Vue](https://vuejs.org/ "Visit the Vue JS wesbite")+[Nuxt](https://nuxtjs.org "Visit the Nuxt website") JavaScript applications powered by the above
+	  - [WorkSafe](https://www.worksafe.vic.gov.au "Visit the WorkSafe Victoria website")'s main website
+	  - [WorkWell](https://www.workwell.vic.gov.au "Visit the WorkWell website"), a custom web application
+  - [Publicly-accessible digital playbook](https://www.worksafe.vic.gov.au/playbook "Visit the WorkSafe Playbook") explaining how WorkSafe Victoria could run a project like this again
+- Designing easier-to-access vital government services
+- Great tech creating whole-of-government value
+
+</TwoUp>
+<TwoUp title="My role">
+
+- Led development of the Vue component library and main website's Nuxt app
+- Worked with interaction designers building out a component-based digital design system
+- Worked with Drupal developers coordinating CMS & API requirements
+- Worked with service design team and directly with the client defining features and the definition of done in an agile workflow
+- Coordinated component library development with the WorkWell app team
+  - Managed distribution and compatibility 
+- Worked with backend developer delivering JS app for Docker/Kubernetes hosting from Victorian government Single Digital Presence project
+- Reviewed code contributions from team members and contractors
+
+</TwoUp>
+<TwoUp title="Learnings/notes">
+
+- SSR (Server-side rendered) JavaScript 
+- CMS-run JS websites are more complex than they seem.
+  - Most learning materials focus on working with distinct content types where the frontend defines routes and the IA. It takes some work to let the CMS manage the content tree, metadata, media etc. 
+- Pros and Cons: Building a component library for two projects at once in-flight
+- I like Vue. Nuxt and Drupal 8 are pretty ok.
+- Always wish Drupal had a better content editor interface and workflow
+- Not a fan of Drupal's default {JSON:API} spec API
+- Storybook was decent to work with. Hard to really tell how useful it is at the beginning - would love to hear from the developers who took over the work.
+  - Wished we could have used a more holistic design system documentation tool but couldn't find one that worked well for Vue. Made it work by rendering markdown files in Storybook.
 
 </TwoUp>
 </Container>
