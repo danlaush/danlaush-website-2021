@@ -1,16 +1,16 @@
 import React from "react";
 import Link from "next/link";
 import Head from "next/head";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import Layout from "../components/layout";
 import Container from "../components/container";
 import TwoUp from "../components/two-up";
 import styles from "./index.module.css";
-import {getRoles} from '../lib/api';
+import { getRoles } from "../lib/api";
 
 const formatDate = (date) => {
-  if(!date) return null;
-  return format(new Date(date), 'MMM yyyy')
+  if (!date) return null;
+  return format(new Date(date), "MMM yyyy");
 };
 
 const RootIndex = ({ roles }) => {
@@ -26,14 +26,11 @@ const RootIndex = ({ roles }) => {
   };
 
   return (
-    <Layout title={headerTitle} link={headerLink}>
+    <Layout htmlTitle="Hello" title={headerTitle} link={headerLink}>
+      <Head>
+        <meta name="description" content="I build things for people." />
+      </Head>
       <Container>
-        <Head
-          title="Dan Laush | Front-end developer."
-          htmlAttributes={{ lang: "en" }}
-        >
-          <meta name="description" content="I build things for people." />
-        </Head>
         <TwoUp title="Work">
           <ul className={styles.projectsList}>
             <li>
@@ -86,7 +83,10 @@ const RootIndex = ({ roles }) => {
                   <a className={styles.roleLink} href={url}>
                     {organisation}
                   </a>
-                  &nbsp;<span className={styles.roleDuration}>{formatDate(startDate)}—{formatDate(endDate)}</span>
+                  &nbsp;
+                  <span className={styles.roleDuration}>
+                    {formatDate(startDate)}—{formatDate(endDate)}
+                  </span>
                 </p>
                 <div
                   className={styles.roleDetails}
