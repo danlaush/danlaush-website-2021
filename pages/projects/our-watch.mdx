@@ -1,11 +1,19 @@
+import Image from 'next/image';
 import Project from '../../components/project';
 import Container from '../../components/container';
 import TwoUp from '../../components/two-up';
+import { MediaSection } from '../../components/media';
 
 <Project
   title="Our Watch"
   description="Helped a non-profit on their mission to change the conversation around violence against women with a family of static sites.">
 <Container>
+<MediaSection
+  src="/media/our-watch/desktop.png"
+  alt="A desktop screenshot of the Our Watch hub for workplace violence against women"
+  width={2880}
+  height={1800}
+/>
 <TwoUp title="Project, in brief">
 
 - Domestic violence research group pursuing nationwide behavioural change

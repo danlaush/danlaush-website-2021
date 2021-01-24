@@ -1,11 +1,18 @@
 import Project from '../../components/project';
 import Container from '../../components/container';
 import TwoUp from '../../components/two-up';
+import { MediaSection } from '../../components/media';
 
 <Project
   title="Worksafe"
   description="Modernised WorkSafe Victoria's web presence to help achieve their goal of getting Victorian workers home safely.">
 <Container>
+<MediaSection
+  src="/media/worksafe/desktop.png"
+  alt="WorkSafe homepage"
+  width={3840}
+  height={2160}
+/>
 <TwoUp title="Project, in brief">
 
 - [Modernised WorkSafe Victoria's web presence](https://www.worksafe.vic.gov.au "Visit the WorkSafe Victoria website")
@@ -35,6 +42,13 @@ import TwoUp from '../../components/two-up';
 - Reviewed code contributions from team members and contractors
 
 </TwoUp>
+<MediaSection
+  src="/media/worksafe/storybook.png"
+  alt="WorkSafe Storybook, showing a list of components, an example render of the Accordion component, and its documentation"
+  width={2280}
+  height={1354}
+  caption="Components were documented in Storybook"
+/>
 <TwoUp title="Learnings/notes">
 
 - SSR (Server-side rendered) JavaScript 

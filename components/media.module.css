@@ -1,0 +1,24 @@
+.section {
+  margin-top: 5.4rem;
+}
+
+.section:first-child {
+  margin-top: 0;
+}
+
+@media screen and (min-width: 768px) {
+  .section {
+    /* display: flex; */
+    margin-top: 8.5rem;
+  }
+}
+
+.mediaContainer {
+  outline: 2px solid lightgrey;
+  background-color: lightgrey;
+  line-height: 0;
+}
+
+.caption {
+  text-align: center;
+}
