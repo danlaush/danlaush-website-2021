@@ -26,7 +26,7 @@ const RootIndex = ({ roles }) => {
   };
 
   return (
-    <Layout htmlTitle="Hello" title={headerTitle} link={headerLink}>
+    <Layout htmlTitle="Hello" description="Frontend developer | I build things for people" title={headerTitle} link={headerLink}>
       <Head>
         <meta name="description" content="I build things for people." />
       </Head>
