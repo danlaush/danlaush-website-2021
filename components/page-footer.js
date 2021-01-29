@@ -1,6 +1,5 @@
 import React from 'react'
 import TwoUp from './two-up'
-import styles from './page-footer.module.css'
 import Container from './container'
 
 export default ({ children, hasSidebar }) => (
@@ -11,10 +10,13 @@ export default ({ children, hasSidebar }) => (
           <a className="link" href="mailto:dan.laush@gmail.com">dan.laush@gmail.com</a>
         </p>
         <p>
-          <a className="link" href="https://twitter.com/danlaush">@danlaush</a>
+          <a className="link" href="https://twitter.com/danlaush">Twitter</a>
         </p>
         <p>
           <a className="link" href="https://github.com/danlaush">Github</a>
+        </p>
+        <p>
+          <a className="link" href="https://www.linkedin.com/in/danlaush/">LinkedIn</a>
         </p>
       </TwoUp>
     </Container>
