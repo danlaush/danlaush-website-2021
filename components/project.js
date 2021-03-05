@@ -3,9 +3,14 @@ import Layout from "./layout";
 import Container from "./container";
 import projectStyles from "./project.module.css";
 
-const Project = ({ title, description, media, children }) => {
+const Project = ({ title, description, media, children, breadcrumb }) => {
   return (
-    <Layout title={title} description={description} media={media} breadcrumb>
+    <Layout
+      title={title}
+      description={description}
+      media={media}
+      breadcrumb={breadcrumb || true}
+    >
       <Container>
         {description && (
           <p className={projectStyles.description}>{description}</p>

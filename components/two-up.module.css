@@ -32,7 +32,7 @@
 }
 
 .sectionContent {
-  max-width: 40rem;
+  max-width: var(--content-width);
 }
 
 .sectionContent > *:first-child {

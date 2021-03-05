@@ -2,7 +2,7 @@ import React from 'react'
 import TwoUp from './two-up'
 import Container from './container'
 
-export default ({ children, hasSidebar }) => (
+const PageFooter = ({ children, hasSidebar }) => (
   <footer>
     <Container>
       <TwoUp title="Get in touch">
@@ -22,3 +22,5 @@ export default ({ children, hasSidebar }) => (
     </Container>
   </footer>
 )
+
+export default PageFooter;

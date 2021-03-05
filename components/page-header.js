@@ -8,7 +8,7 @@ const PageHeader = ({ title, link, breadcrumb }) => (
     <header className={styles.header}>
       <h1 className={styles.title}>{title}</h1>
       {!!breadcrumb && <p className={styles.breadcrumb}>
-        <Link href="/"><a>&larr; Home</a></Link>
+        <Link href={breadcrumb.url || "/"}><a>&larr; {breadcrumb.text || "Home"}</a></Link>
       </p>}
       <p className={styles.name}>
         <Link href="/"><a className={styles.nameLink}>Dan Laush</a></Link>

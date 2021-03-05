@@ -1,5 +1,5 @@
 .description {
-  max-width: 40rem;
+  max-width: var(--content-width);
   font-size: 1.25rem;
   line-height: 1.25;
   letter-spacing: -0.01em;

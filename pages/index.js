@@ -1,19 +1,14 @@
 import React from "react";
 import Link from "next/link";
 import Head from "next/head";
-import { format } from "date-fns";
 import Layout from "../components/layout";
 import Container from "../components/container";
 import TwoUp from "../components/two-up";
 import styles from "./index.module.css";
-import { getRoles } from "../lib/api";
+import { getRoles, listPosts } from "../lib/api";
+import formatDate from "../lib/formatDate";
 
-const formatDate = (date) => {
-  if (!date) return null;
-  return format(new Date(date), "MMM yyyy");
-};
-
-const RootIndex = ({ roles }) => {
+const RootIndex = ({ roles, posts }) => {
   const headerTitle = (
     <>
       Front-end developer.
@@ -74,6 +69,21 @@ const RootIndex = ({ roles }) => {
           </ul>
         </TwoUp>
 
+        <TwoUp title="Web Log">
+          <ul className={styles.projectsList}>
+            {posts.map(({title, slug, date}) => (
+              <li key={slug}>
+                <Link href={`/posts/${slug}`}>
+                  <a className="link">{title}</a>
+                </Link>
+                <p className={styles.projectsListMeta}>
+                  {formatDate(date)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </TwoUp>
+
         <TwoUp title="Resume" pdf>
           {roles.map(
             ({
@@ -115,9 +125,12 @@ const RootIndex = ({ roles }) => {
 
 export const getStaticProps = async () => {
   const roles = await getRoles();
+  const posts = await listPosts();
+  console.log('posts', posts)
   return {
     props: {
       roles,
+      posts,
     },
   };
 };

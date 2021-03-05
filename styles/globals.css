@@ -1,20 +1,4 @@
 /* Mono */
-/* @font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal;
-  font-weight: 300;
-  src: local("IBM Plex Mono Light"), local("IBMPlexMono-Light"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Mono/fonts/split/woff2/IBMPlexMono-Light-Latin3.woff2") format("woff2");
-  unicode-range: U+0102-0103, U+1EA0-1EF9, U+20AB;
-  font-display: swap; }
-
-@font-face {
-  font-family: 'IBM Plex Mono';
-  font-style: normal;
-  font-weight: 300;
-  src: local("IBM Plex Mono Light"), local("IBMPlexMono-Light"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Mono/fonts/split/woff2/IBMPlexMono-Light-Latin2.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF, U+FB01-FB02;
-  font-display: swap; } */
-
 @font-face {
   font-family: 'IBM Plex Mono';
   font-style: normal;
@@ -24,22 +8,6 @@
   font-display: swap; }
 
 /* Sans SemiBold 600 */
-/* @font-face {
-  font-family: 'IBM Plex Sans';
-  font-style: normal;
-  font-weight: 600;
-  src: local("IBM Plex Sans SemiBold"), local("IBMPlexSans-SemiBold"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/split/woff2/IBMPlexSans-SemiBold-Latin3.woff2") format("woff2");
-  unicode-range: U+0102-0103, U+1EA0-1EF9, U+20AB;
-  font-display: swap; }
-
-@font-face {
-  font-family: 'IBM Plex Sans';
-  font-style: normal;
-  font-weight: 600;
-  src: local("IBM Plex Sans SemiBold"), local("IBMPlexSans-SemiBold"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/split/woff2/IBMPlexSans-SemiBold-Latin2.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF, U+FB01-FB02;
-  font-display: swap; } */
-
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
@@ -49,22 +17,6 @@
   font-display: swap; }
 
 /* Sans Medium 500 */
-/* @font-face {
-  font-family: 'IBM Plex Sans';
-  font-style: normal;
-  font-weight: 500;
-  src: local("IBM Plex Sans Medium"), local("IBMPlexSans-Medium"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/split/woff2/IBMPlexSans-Medium-Latin3.woff2") format("woff2");
-  unicode-range: U+0102-0103, U+1EA0-1EF9, U+20AB;
-  font-display: swap; }
-
-@font-face {
-  font-family: 'IBM Plex Sans';
-  font-style: normal;
-  font-weight: 500;
-  src: local("IBM Plex Sans Medium"), local("IBMPlexSans-Medium"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/split/woff2/IBMPlexSans-Medium-Latin2.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF, U+FB01-FB02;
-  font-display: swap; } */
-
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
@@ -74,22 +26,6 @@
   font-display: swap; }
 
 /* Sans Regular 400 */
-/* @font-face {
-  font-family: 'IBM Plex Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local("IBM Plex Sans"), local("IBMPlexSans"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/split/woff2/IBMPlexSans-Regular-Latin3.woff2") format("woff2");
-  unicode-range: U+0102-0103, U+1EA0-1EF9, U+20AB;
-  font-display: swap; }
-
-@font-face {
-  font-family: 'IBM Plex Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local("IBM Plex Sans"), local("IBMPlexSans"), url("./../../../node_modules/@ibm/plex/IBM-Plex-Sans/fonts/split/woff2/IBMPlexSans-Regular-Latin2.woff2") format("woff2");
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF, U+FB01-FB02;
-  font-display: swap; } */
-
 @font-face {
   font-family: 'IBM Plex Sans';
   font-style: normal;
@@ -97,7 +33,6 @@
   src: local("IBM Plex Sans"), local("IBMPlexSans"), url("/fonts/IBMPlexSans-Regular-Latin1.woff2") format("woff2");
   unicode-range: U+0000, U+000D, U+0020-007E, U+00A0-00A3, U+00A4-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A, U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+2074, U+20AC, U+2122, U+2212, U+FB01-FB02;
   font-display: swap; }
-  
 
 html {
   --color-highlight: #7E4AD1;
@@ -108,6 +43,7 @@ html {
   --bp-m: 450px;
   --bp-l: 768px;
   --bl-xl: 1024px;
+  --content-width: 40em;
 
   box-sizing: border-box;
 }
@@ -143,4 +79,15 @@ a {
   height: 1px; width: 1px; 
   margin: -1px; padding: 0; border: 0; 
 }
-  
+
+.float-left {
+  display: block;
+  margin: 0 auto 1.5rem;
+}
+
+@media screen and (min-width: 768px) {
+  .float-left {
+    float: left;
+    margin: 0 2.5rem 1.5rem 0;
+  }
+}
