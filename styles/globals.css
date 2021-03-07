@@ -79,15 +79,3 @@ a {
   height: 1px; width: 1px; 
   margin: -1px; padding: 0; border: 0; 
 }
-
-.float-left {
-  display: block;
-  margin: 0 auto 1.5rem;
-}
-
-@media screen and (min-width: 768px) {
-  .float-left {
-    float: left;
-    margin: 0 2.5rem 1.5rem 0;
-  }
-}

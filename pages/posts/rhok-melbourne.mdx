@@ -1,17 +1,58 @@
----
-title: People focus in order to scale — RHoK Melbourne Summer 2017
-date: "2017-11-29"
----
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+
+export const data = {
+  title: "People focus in order to scale — RHoK Melbourne Summer 2017",
+  date: "2017-11-29",
+}
+
+export const mediaFolder = "/media/blog/rhok-melbourne";
+
+<Media
+  src={`${mediaFolder}/1-group-photo.jpg`}
+  alt="Group photo"
+  width={4000}
+  height={3000}
+  caption="From left: Peter Yuill, Liza Nguyen, Ankit Dahiya, Julie Gibson, Dan Laush, and Shaun Wilde"
+/>
 
 _**tl;dr: Hackathon for social good.** Existing solution was tailored to the technology, not the real problem. Built a client app, API, and serverless worker process to automate the hard parts and simplify the effort required to get things done._
 
 Last weekend I worked with a great team at [Random Hacks of Kindness](http://www.rhokaustralia.org/melbourne/), a hackathon connecting changemakers (people with ideas or organisations for social impact) with hackers (people who turn ideas into reality).
 
+<Media
+  src={`${mediaFolder}/2-logos.png`}
+  alt="Logos for Hitnet Australia and RHoK Melbourne"
+  width={620}
+  height={335}
+/>
+
 My team supported Julie Gibson and her organisation [Hitnet](http://www.hitnet.com.au/), who manage 70+ touchscreen kiosks (called “hubs”) for marginalised communities that contain health and life advice — content co-created by those communities. **Access to information is critical to improving quality of life everywhere**, and it can be challenging to share this, especially with people in remote areas of Australia. It’s also important that the content delivered by these machines come from the communities that will benefit from them.
+
+<Media
+  src={`${mediaFolder}/3-hitnet-hub.jpeg`}
+  alt="A hitnet hub kiosk"
+  width={1024}
+  height={705}
+/>
 
 - I tend to write in lists. It helps me think.
 
+<Media
+  src={`${mediaFolder}/4-hitnet-logo.png`}
+  alt=""
+  width={1707}
+  height={210}
+/>
+
 ## The situation
+
+<Media
+  src={`${mediaFolder}/5-hitnet-kiosk-config.png`}
+  alt="XML config for a kiosk"
+  width={1400}
+  height={810}
+/>
 
 - Hitnet’s information kiosks are spread across the country and the content must be managed remotely.
 - The content on the kiosks are videos and information like “The Diabetes Story” and “Our Lungs, Our Mob”. People are constantly creating new content, and the machines pull down updates from the cloud every day.
@@ -20,6 +61,13 @@ My team supported Julie Gibson and her organisation [Hitnet](http://www.hitnet.c
 - It was a time consuming process for the CEO, the person in the organisation with the most technical skill. It would also be difficult to scale — as Hitnet grow and manage more hubs across Australia, the work required to maintain them skyrockets.
 
 ## The approach
+
+<Media
+  src={`${mediaFolder}/6-whiteboard.jpeg`}
+  alt="A whiteboard diagram of the frontend, backend, and worker levels"
+  width={744}
+  height={557}
+/>
 
 - We approached the problem by separating our concerns as much as possible.
 - The actual sync functionality with the hubs is working decently well. Working with XML files adds a bit of complexity, but it’s a solution and it works. The machines themselves will be upgraded soon as well, so we didn’t want to jump on a moving train.
@@ -37,17 +85,31 @@ My team supported Julie Gibson and her organisation [Hitnet](http://www.hitnet.c
 
 ## The solution
 
+<Media
+  src={`${mediaFolder}/7-screenshot.png`}
+  alt="Screenshot of new hub manager user interface"
+  width={1024}
+  height={495}
+/>
+
 - **Frontend Client — React ([Github](https://github.com/RHoKAustralia/hitnet-ui))**
-- Dan and Liza
-- Users access a web application to manage the content modules and hubs. API-driven, client requires static assets only.
+    - Dan and Liza
+    - Users access a web application to manage the content modules and hubs. API-driven, client requires static assets only.
 - **API — Nginx & Postgres**
-- Ankit and Peter
-- The client app interfaces with an API, storing the information in a database. It also keeps a log of changes to the content on each hub for auditing purposes (when & why was this added to this hub).
-- Apparently there’s a way that Nginx and Postgres can work together to manage a REST API without an app in between. Who knew. [Ed: not Dan, that’s for sure]
+    - Ankit and Peter
+    - The client app interfaces with an API, storing the information in a database. It also keeps a log of changes to the content on each hub for auditing purposes (when & why was this added to this hub).
+    - Apparently there’s a way that Nginx and Postgres can work together to manage a REST API without an app in between. Who knew. [Ed: not Dan, that’s for sure]
 - **Worker — Serverless Node on Google Cloud Platform ([Github](https://github.com/RHoKAustralia/hitnet-worker))**
-- Shaun
-- When triggered, either automatically on a schedule or by a “publish” command from the client app, the worker app fetches data from the API and processes it, generating XML files for each hub with the correct content modules.
-- The hubs continue to check in as they always have, expecting the same XML file.
+    - Shaun
+    - When triggered, either automatically on a schedule or by a “publish” command from the client app, the worker app fetches data from the API and processes it, generating XML files for each hub with the correct content modules.
+    - The hubs continue to check in as they always have, expecting the same XML file.
+
+<Media
+  src={`${mediaFolder}/8-group-working.jpeg`}
+  alt="Photo of the group working"
+  width={4000}
+  height={3000}
+/>
 
 ## Next steps
 
@@ -77,5 +139,7 @@ While we came close to a finished product on the weekend, there are some final p
 - Functionality
     - More matching criteria
     - Country/state/region, demographic, date range
-    - Add custom criteria per module<>hub relationship
+    - Add custom criteria per module/hub relationship
     - “This module should be shown on these 3 hubs, but on this hub it should only be visible from this date to that date.”
+
+export default ({children}) => <Post {...data}>{children}</Post>

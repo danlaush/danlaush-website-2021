@@ -1,9 +1,12 @@
----
-title: Adam Brock Movie Recommendation API
-date: "2017-05-16"
----
+import Post from '../../components/post.js';
+import styles from '../../components/post.module.css'
 
-<img src="/media/blog/movie-recommendation-api/adam-brock.gif" alt="Adam Brock" class="float-left" />
+export const data = {
+  title: "Adam Brock Movie Recommendation API",
+  date: "2017-05-16"
+}
+
+<img src="/media/blog/movie-recommendation-api/adam-brock.gif" alt="Adam Brock" className={styles['float-left']} />
 
 Our colleague Adam Brock loves movies and TV shows — he’s seen everything and knows every actor and always has a movie in mind for every situation he’s in. He’ll even have a _Nicholas Cage film_ for every situation he’s in.
 
@@ -55,3 +58,5 @@ _*Note — The technology is still under development, some queries may have side
 ## But really
 
 Adam is a great colleague and a pleasure to work with. And he really does love movies. He once spent half a client meeting reciting Nicholas Cage’s filmography, in chronological order.
+
+export default ({children}) => <Post {...data}>{children}</Post>

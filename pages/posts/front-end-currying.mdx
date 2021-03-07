@@ -1,0 +1,216 @@
+import Post from '../../components/post.js';
+
+export const data = {
+  title: "Currying for front-end developers",
+  date: "2020-04-07",
+  featured: true,
+}
+
+Currying is a concept from the computer science world which has become popular in Javascript thanks to the Functional Programming paradigm. It’s the idea of calling a series of functions with a single argument, instead of one function with many arguments:
+
+```js
+myFunction(a, b, c, d);
+// vs
+myFunction(a)(b)(c)(d);
+```
+
+This is a pretty heavy-handed simplification and skips over a lot of the true power of currying, but I’m a front-end developer who mostly focuses on the UI. I never made an effort to understand it. It felt very… computer science-y. I didn’t see how I would use it, so I skimmed it and moved on. Then I found myself needing to **conditionally transform some data in a .then() Promise chain**, and suddenly currying was useful and even intuitive.
+
+This article explores one use for currying. There are many more benefits and I leave the rest of the internet’s resources to help you with those. Maybe this can be the start of a beautiful journey into functional programming for you.
+
+We’ll **start with an example that seems a bit silly** (adding two numbers) in order to understand how it works, and then **move on to an example where it feels more natural** (data fetching, Promises, and transforms).
+
+## Currying add()
+
+Normally I would write a function with multiple parameters, and run it by calling it with 2 arguments: 
+
+```js
+function add(a, b) {
+    return a + b;
+}
+add(1, 2) // returns 3
+```
+
+Currying is the idea of taking that series of arguments and separating them into multiple function calls that each take a single parameter:
+
+```js
+function add(a) {
+    return function(b) {
+        return a + b;
+    } 
+}
+
+const addFirst = add(1) // returns a new function
+const sum = addFirst(2) // returns 3
+// More succinct:
+const sumQuick = add(1)(2) // returns 3
+```
+
+1. Runs the function `add` with `1` as an argument
+2. `add` returns a function
+3. Run this new function with the `2` argument
+
+Thanks to Javascript’s idea of a closure, when we run the first `add(1)` command we create a context where the value of `a` sticks around. When we call the inner function with `b`, it also has access to the `a` value and can use both of them to return a new value.
+
+## Currying in a real use case
+
+That seems a bit obtuse for addition. Where would I actually want or need to use this? Consider Promises:
+
+```js
+function async getData() {
+    const apiData = await fetch(API_URL);
+}
+```
+
+The `fetch()` function returns a Promise, and when that Promise is successful I can pass the result to a function of my choice. I use this to transform the API response into something more useful for my application:
+
+```js
+function transformData(fetchResponse) {
+    return {
+        // Here I can modify the data structure given to me by the API
+        // In the getData() function below, const result will
+        // equal whatever I return here.
+    }
+}
+
+function async getData() {
+    const result = await fetch(API_URL).then(transformData);
+}
+```
+
+Notice inside the `.then` we don’t run the function with parentheses (`transformData()`), we merely point to it (`transformData`). Javascript will trigger the function to run when it’s ready, and it will run it with the argument returned by the `fetch()` command.
+
+But… what if I need to transform the data in different ways sometimes, depending on when the fetch function is run?
+
+```js
+function transformData(fetchResponse) {
+    if (meetsSomeCondition) {
+        return {
+            // one data structure
+        }
+    }
+    return {
+        // a different data structure
+    }
+}
+```
+
+Where can we get `meetsSomeCondition` from?
+
+```js
+// BROKEN
+function async getData(meetsSomeCondition = false) {
+    const result = await fetch(API_URL).then(transformData(meetsSomeCondition));
+}
+```
+
+The above code snippet **will not work.** `.then()` needs a pointer to a function - what we’ve done is run our transformData function which returns an object. 
+
+This is where currying is useful. We’ll make our transformData function return a function, so we can run it once with our condition, and return a shiny new function, ready to be called. Then `.then()` can run it with the fetch result when it needs to:
+
+```js
+function transformData(meetsSomeCondition) {
+    return function(fetchResponse) {
+        if (meetsSomeCondition) {
+            return {
+                // one data structure
+            }
+        }
+        return {
+            // a different data structure
+        }
+    }
+}
+
+function async getData(meetsSomeCondition = false) {
+    const result = await fetch(API_URL).then(transformData(meetsSomeCondition));
+}
+```
+
+## Slimming down with ES6 syntax
+
+The above syntax is kind of a lot. We can make it look cleaner and hopefully easier to skim using ES6 fat arrows. A quick recap of how fat-arrow functions work:
+
+```js
+function myFunc(param1, param2) {
+    return whatever;
+}
+// vs (multi-line function)
+const myFunc = (param1, param2) => {
+    const doStuff = param1 + param2(lol);
+    return whatever;
+}
+// vs (single-expression function that implicitly returns the result)
+const myFunc = (param1, param2) => param1 + param2;
+```
+
+### Stage 1: Convert to fat arrows
+
+```js
+const transformData = (meetsSomeCondition) => {
+    return (fetchResponse) => {
+        if (meetsSomeCondition) {
+            return {
+                // one data structure
+            }
+        }
+        return {
+            // a different data structure
+        }
+    }
+}
+```
+
+### Stage 2: The inner function is a single expression, so we can implicitly return it
+
+```js
+const transformData = (meetsSomeCondition) => (fetchResponse) => {
+    if (meetsSomeCondition) {
+        return {
+            // one data structure
+        }
+    }
+    return {
+        // a different data structure
+    }
+}
+```
+
+### Stage 3: When fat arrow functions only have one parameter, the parentheses can be skipped
+
+```js
+const transformData = meetsSomeCondition => fetchResponse => {
+    if (meetsSomeCondition) {
+        return {
+            // one data structure
+        }
+    }
+    return {
+        // a different data structure
+    }
+}
+```
+
+## Summary
+
+We learned how currying works, and saw how to use it when fetching data to transform the result based on an outside condition.
+
+```js
+const transformData = meetsSomeCondition => fetchResponse => {
+    if (meetsSomeCondition) {
+        return {
+            // one data structure
+        }
+    }
+    return {
+        // a different data structure
+    }
+}
+
+const getData = async (meetsSomeCondition = false) {
+    const result = await fetch(API_URL).then(transformData(meetsSomeCondition));
+    return result;
+}
+```
+
+export default ({children}) => <Post {...data}>{children}</Post>
