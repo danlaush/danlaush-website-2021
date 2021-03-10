@@ -2,6 +2,12 @@
   max-width: 40em;
   line-height: 1.5;
   font-size: 1.3rem;
+  display: grid;
+  grid-template-columns: auto 300px;
+}
+
+.post > * {
+  grid-column: 1 / 1;
 }
 
 .post p,
@@ -49,4 +55,9 @@
 .post h3 {
   margin-top: 3rem;
   margin-bottom: 0.75rem;
+}
+
+.post code[class*="language-"],
+.post pre[class*="language-"] {
+  margin: 2rem 0;
 }

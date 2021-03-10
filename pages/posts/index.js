@@ -10,7 +10,7 @@ const PostsIndex = ({ posts }) => {
     <Layout title="Web log" breadcrumb>
       <Container>
         {Object.keys(posts).sort().reverse().map(year => (
-          <TwoUp title={year}>
+          <TwoUp title={year} key={year}>
             <ul>
             {posts[year].map((post) => (
               <li key={post.slug}>

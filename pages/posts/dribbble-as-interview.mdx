@@ -1,0 +1,91 @@
+import Post from '../../components/post';
+import TwoUp from '../../components/two-up';
+import { Media } from '../../components/media';
+
+export const data = {
+  title: "Dribbble in a front-end developer interview",
+  date: "2018-10-24",
+}
+
+export const mediaFolder = "/media/blog/dribbble-as-interview";
+
+**I would love to be asked this if I was being interviewed for a front-end web development position:**
+
+> “Take a look at this design, say you’d been tasked with implementing it. What are a few things that jump out at you? What will be the interesting, fun or difficult parts? What things come to mind when you see this?”
+
+<Media
+  src={`${mediaFolder}/kikk-festival.gif`}
+  alt="Animated landing page screengrab"
+  width={800}
+  height={600}
+  caption="KIKK Festival 2017 — Homepage by Dogstudio"
+/>
+
+Present the candidate with a dribbble shot link to a UI and give them a minute to look at it and tell you what they think.
+
+This is a valuable exercise for many reasons.
+
+## A real-world task in the interview
+
+I would not expect a front-end developer to implement an algorithm on the white board or answer a [leetcode question](https://leetcode.com/), for the role I’m working in at the company I’m working for. Many roles require [Data Structures & Algorithms](https://www.tutorialspoint.com/data_structures_algorithms/) skills and thus demand those types of questions, including some jobs in the front-end space, but for the type of work I do at my company and the projects I complete it doesn’t feel like the most relevant skill to the job at hand. Valuable, certainly, but not an every-day required skill.
+
+_This is quite a common description I hear of interviews in [/r/cscareerquestions](https://www.reddit.com/r/cscareerquestions)_
+
+So if you aren’t asking DS&A questions, what should you ask?
+
+The ability to dissect a design and decide how it should be structured in code is a skill I do use on most days. The ability to spot challenging pieces of layout, ask questions, and identify accessible fallbacks and progressive enhancements are all important to being successful. Perhaps you could include a discussion with a non-technical person they would theoretically be working with and see how they explain to them why it’s difficult, try to see how good of a communicator the candidate is.
+
+## The definition of front-end developer is quite broad
+
+In the last few years the term “front-end developer” has changed quite a bit, in no small part to JavaScript moving to the server.
+
+- Some JavaScript developers learned they could run an HTTP server in a language they already knew, and moved to the back-of-the-front-end to have more control over the web stack.
+- Some UI developers realised they could write one set of templates in JavaScript and craft modern progressively-enhanced web experiences, and they started moving into server-rendered JavaScript.
+- Some devs focus all their effort on the document structure and visual design, becoming experts in accessible HTML and cutting-edge CSS.
+
+I would even struggle to not call all of those people front-end developers (in some cases the line is clearer than others), even though their skillsets are so diverse.
+
+By seeing what the candidate thinks about when studying a design, you can tell where they land on that spectrum. I would say that my particular skills matrix falls somewhere between the 2nd and 3rd bullet points above. The particular hole in the team that the new hire would be filling has its own required skills matrix, so it will be important to see if the candidate’s own unique skills constellation fits.
+
+It would be a clear indicator to the candidate that this is the type of work we do and the skills they would be required to use. As a design studio, it sets expectations about the standards we have for our quality level and precision.
+
+## See how up to date they are
+
+Is the candidate looking to the horizon of the craft? There are changes constantly coming down the pipeline, and it’s good to see that they’re interested in developing themselves. Bonus points for suggesting graceful degradation of features they know aren’t available in all browsers.
+
+<p>
+<Media
+  src={`${mediaFolder}/food-lovers-outcrowd.gif`}
+  alt="Animated landing page screengrab"
+  width={800}
+  height={600}
+  caption="For all food lovers by Outcrowd"
+/>
+</p>
+
+## Via Shop Talk Show
+
+This topic is being discussed on my favourite developer podcast, [Shop Talk Show](https://shoptalkshow.com/) with Chris Coyier of CSS-Tricks and Dave Rupert of Paravel. They’re in the midst of an interview mini-series (luminaries like [Brad Frost](https://twitter.com/brad_frost) and [Mina Markham](https://twitter.com/MinaMarkham)) about their role as a front-end developer and talk about what that means to them.
+
+The final section of each interview is the above activity. The guest goes through a series of dribble shots and shares their thoughts about how they would be implemented.
+
+- [For all food lovers](https://dribbble.com/shots/5060996-For-all-food-lovers) by Outcrowd (An app landing page)
+- [Socialio — Events](https://dribbble.com/shots/4966711-Socialio-Events/attachments/1113052) by Jan Losert (A social platform)
+- [Sibling](https://dribbble.com/shots/4858587-Sibling) by Steve Wolf (A poster)
+- [Finance app](https://dribbble.com/shots/3988951-Finance-app) by Gis1on (A… finance app)
+- [KIKK Festival 2017 — Homepage](https://dribbble.com/shots/3790610-KIKK-Festival-2017-Homepage) by Dogstudio (A music festival website page)
+
+Each interviewee brings a different set of experiences and skills to the discussion, so it’s interesting to compare their approaches. Lots of discussion about reusable components!
+
+## Cheers
+
+Thanks for checking this out. I think interviews are a great opportunity for both parties to get to know each other, but it’s so often not a great experience or valuable tool.
+
+
+
+<TwoUp title="Hello">
+  This is some <strong>nested JSX</strong>
+</TwoUp>
+
+
+export default ({children}) => <Post {...data}>{children}</Post>

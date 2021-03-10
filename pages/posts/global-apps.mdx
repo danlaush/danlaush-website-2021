@@ -1,0 +1,69 @@
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+
+export const data = {
+  title: "How to design and build Javascript apps that respect iOS, Android and Windows Phone UI patterns v0.1*",
+  date: "2018-03-18",
+}
+
+export const mediaFolder = "/media/blog/global-apps";
+
+> _Note: This is v0.1. I don’t actually know the thing yet, I just have a thing I want to learn about. Maybe I’ll actually be able to write it at some point. For now it’s a collection of thoughts about the topic. A public draft. Maybe I’ll version control it and watch it change. I have a lot of half-formed thoughts like this._
+
+It’s great that React Native and friends exist as ways to write webapps that compile to real OS-level apps. You can write once and reach everyone using the power of native apps, and that’s valuable to developers.
+
+The challenging part is that different operating systems have some fundamental differences in how to make a normal/conforming/native-like app.
+
+**Google’s Material Design has a UI Patterns section**
+
+<Media
+  src={`${mediaFolder}/material-ui.png`}
+  alt="Material UI documentation screenshot"
+  width={1400}
+  height={646}
+  caption="Source: https://material.io/guidelines/patterns/navigation.html"
+/>
+
+**It’s quite different from Apple’s Human Interface Guidelines**
+
+<Media
+  src={`${mediaFolder}/apple-human-interface-guidelines.png`}
+  alt="Apple Human Interface Guidelines"
+  width={1400}
+  height={646}
+  caption="Source: https://developer.apple.com/ios/human-interface-guidelines/overview/themes/"
+/>
+
+Example: Android devices always have a back button available because there’s one at the device-level always available. Users know to that move backwards through an app they should use the back button. iPhones don’t, and so options to go back and cancel have to be present in the app interface.
+
+<Media
+  src={`${mediaFolder}/linkedin.png`}
+  alt="Apple Human Interface Guidelines"
+  width={1400}
+  height={571}
+  caption="Left: iOS; Right: Android; Source: [2.] at https://medium.com/@vedantha/interaction-design-patterns-ios-vs-android-111055f8a9b7"
+/>
+
+Example: [more examples]
+
+Is it possible to write-once-build-everywhere that somehow respects operating-system level UI patterns? Is it at least easy to share core functionality and extend when needed?
+
+- “If on apple device: Show back button”
+- Is it harder than that?
+
+I want these to be Good Apps. I want to write javascript and have it create A+ apps for everyone. Native apps are better. They’re faster. They’re (generally) more stable.
+
+I was never a fan of iframe apps, that just load a web app in a WebView. PhoneGap and friends were an important step in the right direction but weren’t quite doing what I wanted.
+
+Counter: Apps can be quite unique and not follow interface guidelines.
+
+- They can look the same across all platforms and work well for everyone.
+- But they can really shine when they feel native and put things in places that users expect. It reduces their mental overhead when navigating, so they can spend more time experiencing the app.
+- Example: Apple has a very specific way users should access their Settings for an app. https://developer.apple.com/ios/human-interface-guidelines/app-architecture/settings/
+- Example: Google has a different way. https://material.io/guidelines/patterns/settings.html
+
+They often come from the same conclusions, but it’s subtle things like the placement of buttons or the organisation and navigation of lists that take an app from good to great.
+
+So… what’s the best way to make the best app for everyone? What do you prioritise? UI design? Development time? Headaches? I guess iterative development is a benefit here. Do as little as you need to do to get going, and figure out what’s causing the most frustrating by testing with users frequently. If it ain’t broke, don’t fix it, but do your own digging and make it a point to be constantly improve.
+
+export default ({children}) => <Post {...data}>{children}</Post>

@@ -1,0 +1,553 @@
+import Post from '../../components/post';
+import {TableOfContents, TableOfContentsItem} from '../../components/table-of-contents';
+import { Media } from '../../components/media';
+
+export const data = {
+  title: "Just-In-Time translations and code that writes itself",
+  date: "2020-09-27",
+  description: "Exploring uses for dynamic imports in javascript",
+}
+
+export const mediaFolder = "/media/blog/global-apps";
+
+## Give the people what they want, nothing more.
+
+Code that never runs is dead code, and it has a cost. The argument for a well-performing web application is beyond the scope of this article, but I recommend Beyond The Bubble by Ben Schwarz ([blog post](https://calibreapp.com/blog/beyond-the-bubble), [JSConfEU recording](https://www.youtube.com/watch?v=rwyZc1keSew)). Suffice it to say that most people don't have an iPhone and their internet is pretty slow. Bytes matter, and useless bytes get in the way of the user experience.
+
+Dynamic imports are one method developers can use to minimize the impact their application has on the user. We can tune the Javascript we ship to do only what it needs, and nothing more. **In this article I’ll discuss some of the ways I’ve been using dynamic imports recently to help control bundle size.**
+
+## Quick recap
+
+In Javascript, one module can use another by importing it.
+
+```js
+import usefulFunction from '../utilities/usefulFunction.js';
+
+function myFunction() {
+  usefulFunction();
+}
+```
+
+The browser (or webpack, if you're bundling) will fetch the imported file as soon as it's defined. Dynamic imports allow the developer to programmatically decide if and when a module should be loaded. 
+
+```js
+async function myFunction() {
+  if(someCondition) {
+    const sometimesUseful = await import('../utilities/sometimesUseful.js');
+    sometimesUseful();
+  }
+}
+```
+
+If <code className="language-js">someCondition</code> is never met, the browser will never download the contents of `helpfulFunction.js`. This gives the developer more control over the code we (often unintentionally) ship to users. [Learn more on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#Dynamic_Imports).
+
+[Back to top](#table-of-contents)
+
+## Minimise the impact of big modules
+
+Sometimes you just need a lot of code. Our `rate-graph` React component requires moment.js, chart.js, and currently it's not set up to tree-shake so it includes all of the Neptune components. Some of those issues are fixable, but in the mean time it's a stinker of a package.
+
+Big Javascript files take time and CPU to parse. One of the top recommendations in our [Lighthouse performance reports](https://developers.google.com/web/tools/lighthouse) are to simply "reduce Javascript execution time"—this [includes parsing and compiling](https://web.dev/bootup-time/) which runs on the main thread. Big files take longer to parse, and any single task on the main thread [longer than 50ms is noticeable lag](https://web.dev/tbt/). An easy way to work on this is to break big files up - multiple smaller tasks don't cause the browser to freeze.
+
+Many off-the-shelf setups like `create-react-app` and `next.js` have webpack configured to break code down into smaller files already, but choosing to dynamically import a module gives us more control over and confidence in the outcome.
+
+### React.lazy() and Suspense
+
+In the following code example, we tell React to first render everything except the chonky graph. Once the app boots up, it then requests rate graph and displays the spinner until that `Promise` resolves. This means users get to see the rest of the app while the graph is downloading. This is another benefit over one big javascript file: users see _something_ quickly and can see there's more on the way. This improves [perceived performance](https://developer.mozilla.org/en-US/docs/Learn/Performance/perceived_performance) even if the same volume of code ends up in the browser. Maybe their task in loading the app has nothing to do with the graph—they could solve their problem before the graph finishes loading.
+
+```jsx
+import React, { lazy, Suspense } from 'react';
+import { Loader } from '@transferwise/components';
+
+const RateGraph = lazy(() => import('@transferwise/rate-graph'))
+
+const MyApp = () => (<>
+  <h1>Rate graph</h1>
+  <Suspense fallback={<Loader />}>
+    <RateGraph />
+  </Suspense>
+</>)
+```
+
+[Learn more about lazy+Suspense in the react docs](https://reactjs.org/docs/code-splitting.html#reactlazy). For server-side rendering support in Next.JS, check out [next/dynamic](https://nextjs.org/docs/advanced-features/dynamic-import) and keep reading to learn about some gotchas with it.
+
+[Back to top](#table-of-contents)
+
+## Use a language-specific bundle of a component
+
+One source of dead code is translations. Naïve or MVP implementations might bundle all the translations needed to display the app:
+
+```jsx
+<TranslationProvider messages={{
+  en: { cta: 'Get Started' },
+  de: { cta: 'Jetzt loslegen' },
+  fr: { cta: 'Commencer' },
+}}>
+```
+
+> If you've never worked with translation keys/messages, the core idea is that instead of putting plain text in your app, you replace that text with a `key`. When rendering, check the user's language and substitute that key with the translated version of your text in that language.
+> 
+> For example, instead of `<a href="">Get started</a>` I would say `<a href="">{translate('cta')}</a>`. The translate function looks at the current language to decide whether it should say "Get started" or "Commencer".
+
+For a user who never changes their language, the extra translations are dead code. This balloons exponentially, as every new string is multiplied by every language you support, and introducing a new language creates another copy of every string.
+
+Many Transferwise packages use [webpack-translations-plugin](https://github.com/transferwise/webpack-translations-plugin), which generates a dist file for each translation in addition to the main bundle:
+
+```
+~/node_modules/@transferwise/public-navigation/dist $ ls
+├─ public-navigation.js # 210.3kb at time of writing
+├─ public-navigation.cs.js # 61.9kb
+├─ public-navigation.de.js # 62.1kb
+├─ public-navigation.el.js # 62.8kb
+├─ public-navigation.es.js # 62.4kb
+├─ ...
+```
+
+The single-language bundles of `public-navigation` are **70% smaller than the default**. Seventy percent! We can improve the experience for most users by importing the nav with just one language. To solve this, we can give `import()` a variable:
+
+```jsx
+import React, { lazy, Suspense } from 'react';
+import { Loader } from '@transferwise/components';
+
+const MyApp = () => {
+  const [language, setLanguage] = useState('en');
+  // ⚠️ WARN: This will not SSR in Next.js. Keep reading.
+  const RateGraph = lazy(() =>
+    import(`@transferwise/rate-graph/dist/rateGraph.${language}.js`)
+  )
+  return (<>
+    <h1>My app</h1>
+    <Suspense fallback={<Loader />}>
+      <RateGraph />
+    </Suspense>
+  </>)
+}
+```
+
+Now if the `language` variable changes, React will fall back to the `Loader` while it imports the new language bundle. The small percentage of people who change their language can wait a bit longer if it means everyone else saves nearly **150kb of dead code**.
+
+### ⚠️ Caveat: variables force webpack to build every matching file ⚠️
+
+When you dynamically `() => import('sometimesUseful.js')`, webpack and other bundlers know that the file `sometimesUseful.js` is a unit of code that should be available in the compiled output for the cases when it's needed at runtime. It **might never** be used, but we told webpack to make it available.
+
+How should webpack interpret a variable-based import? At runtime you might need anything that matches the template string in the source folder, so the only thing it can do is build _everything_ that matches. This is ok for places where you know and are confident in the folder you're pointing to, like `rate-graph` or `public-navigation`.
+
+**Pro tip: Don't `import('moment/locale/${language}')`**. It _is_ correct to `import('moment/locale/fr')`, but if you import `locale/${language}`, it will build every single file in that folder in case it's needed.
+
+Every.
+
+Single.
+
+File.
+
+Some say my machine is still trying to finish that job. I wish it all the best.
+
+[Back to top](#table-of-contents)
+
+## Load one moment.js locale at a time
+
+Moment is another great place to minimise bundle size by only loading one locale at a time. The moment docs guide you to statically import the locales you require, so they're available when you set the global moment instance to a new locale:
+
+```js
+import moment from 'moment';
+import 'moment/locale/fr';
+
+moment().format('LLLL'); // Sunday, July 15 2012 11:01 AM
+moment().locale('fr');
+moment().format('LLLL'); // Dimanche 15 Juillet 2012 11:01
+```
+
+> Note: This example comes from a `create-react-app` (CRA) project. By default, `import moment from 'moment'` includes ALL locales. CRA makes the opinionated decision to only include English in your bundle, so I didn't have to strip out the others. [Moment has some docs about this.](https://momentjs.com/docs/#/use-it/webpack/)
+
+Like translations, there's no need for browsers to load date formatting translations they don't need. However for moment, I opted for a `switch` instead of a variable-based import for 2 reasons:
+
+1. The locale strings moment uses don't always match the TransferWise norms so some have to be mapped
+2. There are a LOT of moment locales we don't need. Per the caveat above, using a variable would build every locale which would slow down build times.
+
+```js
+const loadMoment = async (language) => {
+  switch (language) {
+    case 'bg': return await import(`moment/locale/bg`);
+    case 'pt': return await import(`moment/locale/pt-br`);
+    case 'zh': return await import(`moment/locale/zh-cn`);
+    case 'zh_HK': return await import(`moment/locale/zh-hk`);
+    case default: return null; // language === en goes here, moment default
+  }
+}
+```
+
+But where should this import command run? We need it to change based on React state, but Moment exists outside the React context. I created a loader component to manage it, which sits in the app above all the components which use Moment. When it sees the app's language change, it runs the `loadMoment()` function and initialises it with `moment.locale()`.
+
+```jsx
+const Graph = ({time, rates}) => (
+  <MomentLoader>
+    <TimeAgo time={time} /> {/* Displays a formatted time fromNow */}
+    <RateGraph historicRates={rates} /> {/* Chart.js uses moment to display time data */}
+  </MomentLoader>
+)
+
+// Warning: this won't work, keep reading
+const MomentLoader = ({ children }) => {
+  // Uses a retranslate context to track changes in the language
+  const { language } = useTranslations();
+
+  useEffect(() => {
+    (async () => {
+      // Whenever the language changes, load a locale and apply it
+      await loadMoment(language);
+      moment.locale(language)
+    })();
+  }, [language])
+
+  return children;
+}
+```
+
+There's something missing though. When the language changes and the global moment instance is updated, it doesn't have an effect on React's state so it sees no reason to re-render. This means the formatted dates continue to display with the old moment locale. To solve this, we can track an extra bit of state and use it as a key prop—when the prop changes, it will trigger a re-render which will use moment with the latest locale module.
+
+```jsx
+const MomentLoader = ({ children }) => {
+  const { language } = useTranslations();
+  // Using this as a key triggers a re-render when a new locale has loaded
+  const [momentLocale, setMomentLocale] = useState(null);
+
+  useEffect(() => {
+    async function effectFn() {
+      await loadMoment(language);
+      moment.locale(language)
+      setMomentLocale(language)
+    }
+    effectFn();
+  }, [language])
+
+  return (
+    <Fragment key={momentLocale}>
+      {children}
+    </Fragment>
+  );
+}
+```
+
+[Back to top](#table-of-contents)
+
+## Load one set of translations at a time (Just-In-Time)
+
+It's great that we can use existing single-language bundles of shared components, but it means that changing the language forces the browser to re-download the same component with different text. It would be better if changing the language downloaded just the new text. There may be a better approach for shared components, but what I'll explain here works well for text in the app I'm managing.
+
+`retranslate`'s `TranslationProvider` component takes a `messages` object with translation keys for all the available languages:
+
+```jsx
+import { TranslationProvider } from 'retranslate';
+ 
+const App = () => (
+  <TranslationProvider messages={{
+      cs: { ctaText: 'Click me' },
+      de: { ctaText: 'Klick mich' },
+      el: { ctaText: 'κάντε κλικ με' },
+    }}
+    language="en"
+    fallbackLanguage="en"
+  ></TranslationProvider>
+);
+```
+
+This enables toggling between languages at any time, at the cost of downloading all translations in all languages. Most people don't need that, and the volume of this data grows exponentially as we expand globally and support more languages.
+
+I've started using an `<AsyncTranslationProvider />` that wraps retranslate, and like the `<MomentLoader />` downloads a new set of messages when the user changes the language.
+
+```jsx
+import { TranslationProvider } from 'retranslate';
+ 
+const AsyncTranslationProvider = ({ requestedLanguage }) => {
+  const [language, setLanguage] = useState('');
+  const [messages, setMessages] = useState({});
+
+  // Whenever requestedLanguage prop changes, like when the user clicks the language picker
+  // State managed in the parent <App />
+  useEffect(() => {
+    (async () => {
+      try {
+        // Fetch the messages file for that language and update the state to include it
+        const newMessages = await import(`~translations/messages.${requestedLanguage}.json`);
+        setMessages(newMessages);
+        // Only when new messages are available should React re-render in the new language
+        setLanguage(requestedLanguage);
+      } catch (e) {
+        console.log('oops');
+      }
+    })();
+  }, [requestedLanguage])
+
+  return (
+    <TranslationProvider
+      messages={{ [language]: messages }} /* Now messages will only ever have one set of keys */
+      language={language}
+    >
+      {children}
+    </TranslationProvider>
+  )
+};
+```
+
+Using this method, only one language's text is downloaded to the browser at a time. A few things to note:
+
+- Text content will not server-side render in Next.js—users (and Google) will see translations keys at first. Because the translations are loaded in a `useEffect`, they don't run on the server. See below for more thoughts on this hairy issue.
+- The component expects a `requestedLanguage` prop and manages `language` in its own state instead of using the parent `App`'s language as the source of truth. When the user changes the language, React shouldn't re-render until it's sure the new messages are ready to display. If it passed the app's selected language directly to Provider, there would be a lag between the user interaction and the messages being displayed.
+- This example doesn't use a fallback language on the Provider. Crowdin will automatically fill in missing translation keys with the source text so that should never be used. It means there's a non-zero risk that the App loads but the messages import fails, displaying an interface with no text.
+
+[Back to top](#table-of-contents)
+
+## Complications with Server-Side Rendering and Next.js
+
+This is the hairy bit, the titular code that writes itself. So far my examples have all worked in the browser with features native to Javascript or provided out of the box by React. The story changes when you need components to server-side render (SSR).
+
+`Next.js` can SSR dynamically-imported components with its [next/dynamic module](https://nextjs.org/docs/advanced-features/dynamic-import). It works in a similar way to `React.lazy()`, but the fallback state is built into the component - no wrapping `<Suspense>` required. It uses [loadable-components](https://loadable-components.com/) under the hood.
+
+```jsx
+import dynamic from 'next/dynamic'
+import { Loader } from '@transferwise/components';
+
+const RateGraph = dynamic(
+  () => import('@transferwise/rate-graph'),
+  { loading: <Loader /> }
+)
+
+const MyApp = () => (<>
+  <h1>My app</h1>
+  <h2>Rate graph</h2>
+  <RateGraph />
+</>)
+```
+
+### The problem: `next/dynamic` doesn't support variables
+
+I tried to use the `import('public-navigation.${language}.js')` approach from above in a `dynamic()` and it wouldn't SSR. [Tim Neutkens of Vercel suggests](https://github.com/vercel/next.js/issues/5208#issuecomment-423110547) the `switch` approach like in `MomentLoader`. There was a [request for variable support in 2017](https://github.com/vercel/next.js/issues/2514) but other than that I can't find anything else about it.
+
+In order to server-side render the single-language public navigation, you need a switch statement for each language. It also means that whenever a new language is introduced the loader component needs an update. `loadable-components` doesn't work with named exports, so there's some extra syntax required as well.
+
+```jsx
+// navigationLoader.js
+export default {
+  'cs': {
+    PublicNavigation: dynamic(() => import('public-navigation.cs.js').then(m => m.PublicNavigation)),
+    Footer: dynamic(() => import('public-navigation.cs.js').then(m => m.Footer))
+  },
+  'de': {
+    PublicNavigation: dynamic(() => import('public-navigation.de.js').then(m => m.PublicNavigation)),
+    Footer: dynamic(() => import('public-navigation.de.js').then(m => m.Footer))
+  },
+  ...
+}
+
+// Layout.js
+const Layout = ({ language }) => {
+  const { PublicNavigation, Footer } = navigationLoader(language);
+  return (<>
+    <PublicNavigation />
+    <main />
+    <Footer />
+  </>)
+}
+```
+
+I could just about live with this. It's a hassle that would be nice to automate, but it's workable. Unfortunately, it's just not good enough for the most important use case we had for dynamic imports: Lienzo.
+
+[Back to top](#table-of-contents)
+
+## Dynamic component loading in Lienzo
+
+Lienzo (Spanish for "canvas") is our in-house CMS, a Java app that serves marketing landing pages. We recently set out to modernise the user experience of Lienzo pages by rendering the frontend in a Next.js app (`lienzo-frontend`) with data from the CMS delivered via API.
+
+Editors build their Lienzo page as a series of widgets. Widgets are things like hero banners, calls-to-action, and various layouts of content and tables. The page editor has full control over the types and ordering of widgets on their page, as well as the content within those widgets. 
+
+This is a mockup of the API response that `lienzo-frontend` uses to render the [Paypal Fee Calculator](https://transferwise.com/gb/paypal-fee-calculator)'s widgets:
+
+```json
+{
+  "widgets": [
+    {
+      "type": "HeroBanner",
+      "data": {} // Things like h1, h2, ctaText, ctaHref
+    },
+    {
+      "type": "ImageAndMarkdown",
+      "data": {}
+    },
+    {
+      "type": "CallToAction",
+      "data": {}
+    },
+  ]
+}
+```
+
+### Naive implementation
+
+Since every URL served by `lienzo-frontend` is controlled completely by configuration, none of the React components can be hardcoded into the template.
+
+```jsx
+// A normal Next.js page
+const LandingPage = () => 
+  (<>
+    <PublicNavigation />
+    {/* How can these be re-ordered by a non-dev? */}
+    <HeroBanner />
+    <ImageAndMarkdown />
+    <CallToAction />
+    <Footer />
+  </>);
+```
+
+In the solution below, we:
+
+- import all the available widgets
+- make them identifiable via string
+- map the list of widgets to a component render
+
+```jsx
+import HeroBanner from '~widgets/HeroBanner'
+import CallToAction from '~widgets/CallToAction'
+import ImageAndContent from '~widgets/ImageAndContent'
+import Table from '~widgets/Table'
+
+const WIDGET_MAP = {
+  'HeroBanner': HeroBanner,
+  'CallToAction': CallToAction,
+  'ImageAndContent': ImageAndContent,
+  'Table': Table,
+}
+
+const Widgets = ({widgets}) => (<>
+  {widgets.map({type, data} => {
+    const Widget = WIDGET_MAP[w.type]
+    return <Widget {...data} />
+  })}
+</>)
+```
+
+Now an array of widgets can be fed in as config and they will display in the editor's desired order. Unfortunately, as the list of possible widgets grows all of their combined javascript will be in the main bundle. Next.js might make some decisions about code splitting, but it's highly likely that a user will download javascript for widgets not used on the page. This is where `next/dynamic` comes in handy. We can re-write the above with dynamic imports:
+
+### Dynamic implementation
+
+```jsx
+// widgetLoader.js
+import dynamic from 'next/dynamic';
+
+export default {
+  'HeroBanner': dynamic(() => import('~widgets/HeroBanner')),
+  'CallToAction': dynamic(() => import('~widgets/CallToAction')),
+  'ImageAndContent': dynamic(() => import('~widgets/ImageAndContent')),
+  'Table': dynamic(() => import('~widgets/Table')),
+  'Faq': dynamic(() => import('~widgets/Faq')),
+  ...
+}
+
+// Widgets.js
+import widgetLoader from './widgetLoader.js';
+
+const Widgets = ({widgets}) => (<>
+  {widgets.map(({type, data}) => {
+    const Widget = widgetLoader[type]
+    return <Widget {...data} />
+  })}
+</>)
+```
+
+Now when the page loads, only the necessary imports will trigger for this particular page.
+
+### Ideal (but impossible) implementation
+
+This is where it's a problem that `next/dynamic` doesn't support variables. It would be better if we could take an approach like the following code, where we use the name of the widget as a variable in a single dynamic import.
+
+```jsx
+import dynamic from 'next/dynamic';
+
+const Widgets = ({widgets}) => (<>
+  {widgets.map(({type, data}) => {
+    const Widget = dynamic(() => import(`~widgets/${type}/index.widget.js`))
+    return <Widget {...data} />
+  })}
+</>)
+```
+
+This would mean that new widgets don't need to be added to the import list manually—follow the documented convention for widget folders and your new widget will just work. **We're trying to make it easier for developers to contribute to Lienzo, which has been historically difficult.** This would remove one more thing devs have to worry about.
+
+## Automate the imports anyway
+
+**The code that writes itself**
+
+I've got a silly amount of computing power in my lap, surely we can smash some bits together to automate this in some way. With Javascript as my hammer, everything can be a nail. We can use Node `fs` to create a file. Why not another JS file?
+
+```js
+var stream = fs.createWriteStream('./anModule.js');
+stream.once("open", function (fd) {
+  stream.write('export default () => console.log("hello world");\n');
+  stream.end();
+}
+```
+
+We need to generate a file that looks like `widgetLoader.js` above, with a line for each widget in the project. Node and `glob` can **scan the widgets folder and add a dynamic import for each widget**.
+
+```js
+// ~lib/generateWidgetLoader.js
+var stream = fs.createWriteStream('./widgetLoader.js');
+stream.once("open", function (fd) {
+  stream.write('import dynamic from "next/dynamic";\n\n');
+  stream.write("export default {\n");
+
+  glob("**/*.widget.js", { cwd: '~widgets/' }, function (er, files) {
+    files.forEach((filePath) => {
+      // From `HeroBanner/index.widget.js` to `HeroBanner`
+      const name = stripFileName(filePath);
+      const line = `"${name}": dynamic(
+        () => import("~widgets/${filePath}")
+      ),\n`;
+      stream.write(line);
+    });
+
+    stream.write("}\n");
+    stream.end();
+  });
+}
+```
+
+This file we're generating must be available to Next.js when it starts up, so we have to run the node script before we do any work:
+
+```json
+// package.json
+{
+  "scripts": {
+    "dev": "node ./lib/generateWidgetLoader.js && crab start",
+    "build": "node ./lib/generateWidgetLoader.js && NODE_ENV=production crab build"
+  }
+}
+```
+
+Now our `widgetLoader.js` file:
+
+```jsx
+import dynamic from 'next/dynamic';
+
+export default {
+  'HeroBanner': dynamic(() => import('~widgets/HeroBanner')),
+  'CallToAction': dynamic(() => import('~widgets/CallToAction')),
+  ...
+}
+```
+
+will automatically pick up new widgets to dynamically import, without using variables so they will server-side render.
+
+[Back to top](#table-of-contents)
+
+## Server-side render JIT translations
+
+
+
+
+
+
+
+
+
+
+export default ({children}) => <Post {...data}>{children}</Post>

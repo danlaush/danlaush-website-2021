@@ -1,0 +1,30 @@
+.toc {
+  grid-row: 1/span 1000;
+  grid-column: 2/2!important;
+  font-size: 1rem;
+}
+
+.list {
+  position: sticky;
+  top: 5px;
+  list-style-type: none;
+}
+
+.item {
+  border-left: 2px solid;
+  padding-left: 5px;
+  border-color: currentColor;
+  color: var(--color-grey-mid);
+}
+
+.item.active {
+  color: var(--color-highlight);
+}
+
+.item + .item {
+  margin-top: 5px;
+}
+
+.item a {
+  color: currentColor;
+}
