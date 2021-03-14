@@ -29,20 +29,23 @@ export const TableOfContents = (propsRaw) => {
   const hashes = items.map((i) => i.href);
   const activeHash = useActiveHash(hashes);
   return (
-    <div className={styles.toc}>
-      <ol className={styles.list}>
-        {items.map((i) => (
-          <li
-            className={[
-              styles.item,
-              activeHash === i.href ? styles.active : ""
-            ].filter(Boolean).join(" ")}
-            key={i.href}
-          >
-            <a href={i.href}>{i.title}</a>
-          </li>
-        ))}
-      </ol>
-    </div>
+    <nav className={styles.toc}>
+      <div className={styles.sticky}>
+        <h2 className={styles.title}>Table of Contents</h2>
+        <ol className={styles.list}>
+          {items.map((i) => (
+            <li
+              className={[
+                styles.item,
+                activeHash === i.href ? styles.active : ""
+              ].filter(Boolean).join(" ")}
+              key={i.href}
+            >
+              <a href={i.href}>{i.title}</a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </nav>
   );
 };

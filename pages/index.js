@@ -126,7 +126,6 @@ const RootIndex = ({ roles, posts }) => {
 export const getStaticProps = async () => {
   const roles = await getRoles();
   const posts = await listPosts();
-  console.log('posts', posts)
   return {
     props: {
       roles,

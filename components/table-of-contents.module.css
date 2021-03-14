@@ -1,6 +1,6 @@
 .toc {
   grid-row: 1/span 1000;
-  grid-column: 2/2!important;
+  grid-column: 1/1!important;
   font-size: 1rem;
 }
 
@@ -9,14 +9,30 @@
  * helps it beat the specificity of
  * .post h2
 */
-.toc + *:nth-child(2) {
-  margin-top: 0;
+@media screen and (min-width: 768px) {
+  .toc + *:nth-child(2) {
+    margin-top: 0;
+  }
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 1.5rem);
+  overflow: scroll;
+}
+
+.title {
+  color: var(--color-grey-mid);
+  font-size: 1.2rem;
+  margin-top: 0.8rem!important;
 }
 
 .list {
-  position: sticky;
-  top: 5px;
   list-style-type: none;
+  margin: 0;
+  margin-right: 1rem;
+  padding: 0;
 }
 
 .item {

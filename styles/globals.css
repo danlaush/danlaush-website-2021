@@ -44,6 +44,7 @@ html {
   --bp-l: 768px;
   --bl-xl: 1024px;
   --content-width: 40em;
+  --sidebar-width: 12.5rem;
 
   box-sizing: border-box;
 }

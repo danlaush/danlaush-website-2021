@@ -1,5 +1,5 @@
 import Post from '../../components/post';
-import {TableOfContents, TableOfContentsItem} from '../../components/table-of-contents';
+import { TableOfContents } from '../../components/table-of-contents';
 import { Media } from '../../components/media';
 
 export const data = {
@@ -13,7 +13,7 @@ export const mediaFolder = "/media/blog/global-apps";
 
 ## Give the people what they want, nothing more.
 
-Code that never runs is dead code, and it has a cost. The argument for a well-performing web application is beyond the scope of this article, but I recommend Beyond The Bubble by Ben Schwarz ([blog post](https://calibreapp.com/blog/beyond-the-bubble), [JSConfEU recording](https://www.youtube.com/watch?v=rwyZc1keSew)). Suffice it to say that most people don't have an iPhone and their internet is pretty slow. Bytes matter, and useless bytes get in the way of the user experience.
+Code that never runs is dead code, and it has a cost. The core argument for a well-performing web application is beyond the scope of this article, but I recommend Beyond The Bubble by Ben Schwarz ([blog post](https://calibreapp.com/blog/beyond-the-bubble), [JSConfEU recording](https://www.youtube.com/watch?v=rwyZc1keSew)). Suffice it to say that most people don't have an iPhone and their internet is pretty slow. Bytes matter, and useless bytes get in the way of the user experience.
 
 Dynamic imports are one method developers can use to minimize the impact their application has on the user. We can tune the Javascript we ship to do only what it needs, and nothing more. **In this article I’ll discuss some of the ways I’ve been using dynamic imports recently to help control bundle size.**
 

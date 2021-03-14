@@ -1,6 +1,7 @@
 import Post from '../../components/post';
 import TwoUp from '../../components/two-up';
 import { Media } from '../../components/media';
+import { TableOfContents } from '../../components/table-of-contents';
 
 export const data = {
   title: "Dribbble in a front-end developer interview",
@@ -80,12 +81,6 @@ Each interviewee brings a different set of experiences and skills to the discuss
 ## Cheers
 
 Thanks for checking this out. I think interviews are a great opportunity for both parties to get to know each other, but it’s so often not a great experience or valuable tool.
-
-
-
-<TwoUp title="Hello">
-  This is some <strong>nested JSX</strong>
-</TwoUp>
 
 
 export default ({children}) => <Post {...data}>{children}</Post>
