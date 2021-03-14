@@ -43,6 +43,12 @@
  pre {
    background: #272822;
  }
+
+ .mdx-marker {
+   background: #444;
+   margin: 0 -1em;
+   padding: 0 1em;
+ }
  
  /* Inline code */
  :not(pre) > code {

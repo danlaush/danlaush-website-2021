@@ -6,7 +6,6 @@ export const data = {
   title: "Just-In-Time translations and code that writes itself",
   date: "2020-09-27",
   description: "Exploring uses for dynamic imports in javascript",
-  toc: false,
 }
 
 export const mediaFolder = "/media/blog/global-apps";
@@ -29,7 +28,7 @@ function myFunction() {
 }
 ```
 
-The browser (or webpack, if you're bundling) will fetch the imported file as soon as it's defined. Dynamic imports allow the developer to programmatically decide if and when a module should be loaded. 
+The browser (or webpack, if you're bundling) will fetch the imported file as soon as it's defined. Dynamic imports, on the other hand, allow the developer to programmatically decide if and when a module should be loaded. 
 
 ```js
 async function myFunction() {
@@ -46,15 +45,15 @@ If <code className="language-js">someCondition</code> is never met, the browser 
 
 ## Minimise the impact of big modules
 
-Sometimes you just need a lot of code. Our `rate-graph` React component requires moment.js, chart.js, and currently it's not set up to tree-shake so it includes all of the Neptune components. Some of those issues are fixable, but in the mean time it's a stinker of a package.
+Sometimes you just need a lot of code. At [Wise](https://wise.com/), our `rate-graph` React component requires moment.js, chart.js, and currently it's not set up to tree-shake so it includes all of the design system components. Some of those issues are fixable, but in the mean time it's a stinker of a package.
 
 Big Javascript files take time and CPU to parse. One of the top recommendations in our [Lighthouse performance reports](https://developers.google.com/web/tools/lighthouse) are to simply "reduce Javascript execution time"—this [includes parsing and compiling](https://web.dev/bootup-time/) which runs on the main thread. Big files take longer to parse, and any single task on the main thread [longer than 50ms is noticeable lag](https://web.dev/tbt/). An easy way to work on this is to break big files up - multiple smaller tasks don't cause the browser to freeze.
 
 Many off-the-shelf setups like `create-react-app` and `next.js` have webpack configured to break code down into smaller files already, but choosing to dynamically import a module gives us more control over and confidence in the outcome.
 
-### React.lazy() and Suspense
+### `React.lazy()` and `Suspense`
 
-In the following code example, we tell React to first render everything except the chonky graph. Once the app boots up, it then requests rate graph and displays the spinner until that `Promise` resolves. This means users get to see the rest of the app while the graph is downloading. This is another benefit over one big javascript file: users see _something_ quickly and can see there's more on the way. This improves [perceived performance](https://developer.mozilla.org/en-US/docs/Learn/Performance/perceived_performance) even if the same volume of code ends up in the browser. Maybe their task in loading the app has nothing to do with the graph—they could solve their problem before the graph finishes loading.
+We'll start with dynamic imports by using React's built-in tools: `lazy` and `Suspense`. In the following code example, we tell React to first render everything except the chonky graph. Once the app initialises in the browser and displays the header, it then requests rate graph and displays the loader until it's ready. This means users get to see the rest of the app while the graph is downloading. This is another benefit over one big javascript file: users see _something_ quickly and can see there's more on the way. This improves [perceived performance](https://developer.mozilla.org/en-US/docs/Learn/Performance/perceived_performance) even if the same volume of code ends up in the browser. Maybe their goal in loading the app has nothing to do with the graph—they could solve their problem before the graph even finishes. With a static import, that wouldn't be possible.
 
 ```jsx
 import React, { lazy, Suspense } from 'react';
@@ -92,7 +91,7 @@ One source of dead code is translations. Naïve or MVP implementations might bun
 
 For a user who never changes their language, the extra translations are dead code. This balloons exponentially, as every new string is multiplied by every language you support, and introducing a new language creates another copy of every string.
 
-Many Transferwise packages use [webpack-translations-plugin](https://github.com/transferwise/webpack-translations-plugin), which generates a dist file for each translation in addition to the main bundle:
+Many Wise packages use [webpack-translations-plugin](https://github.com/transferwise/webpack-translations-plugin), which generates a dist file for each translation in addition to the main bundle:
 
 ```
 ~/node_modules/@transferwise/public-navigation/dist $ ls
@@ -104,7 +103,7 @@ Many Transferwise packages use [webpack-translations-plugin](https://github.com/
 ├─ ...
 ```
 
-The single-language bundles of `public-navigation` are **70% smaller than the default**. Seventy percent! We can improve the experience for most users by importing the nav with just one language. To solve this, we can give `import()` a variable:
+The single-language bundles of the `public-navigation` package are **70% smaller than the default**. Seventy percent! We can improve the experience for most users by importing the nav with just one language. To solve this, we can give `import()` a variable:
 
 ```jsx
 import React, { lazy, Suspense } from 'react';
@@ -129,7 +128,7 @@ Now if the `language` variable changes, React will fall back to the `Loader` whi
 
 ### ⚠️ Caveat: variables force webpack to build every matching file ⚠️
 
-When you dynamically `() => import('sometimesUseful.js')`, webpack and other bundlers know that the file `sometimesUseful.js` is a unit of code that should be available in the compiled output for the cases when it's needed at runtime. It **might never** be used, but we told webpack to make it available.
+When you dynamically `() => import('sometimesUseful.js')`, webpack and other bundlers know that the file `sometimesUseful.js` should be available in the compiled output for the cases when it's needed at runtime. It **might never** be used, but we told webpack to make it available.
 
 How should webpack interpret a variable-based import? At runtime you might need anything that matches the template string in the source folder, so the only thing it can do is build _everything_ that matches. This is ok for places where you know and are confident in the folder you're pointing to, like `rate-graph` or `public-navigation`.
 
@@ -204,9 +203,9 @@ const MomentLoader = ({ children }) => {
 }
 ```
 
-There's something missing though. When the language changes and the global moment instance is updated, it doesn't have an effect on React's state so it sees no reason to re-render. This means the formatted dates continue to display with the old moment locale. To solve this, we can track an extra bit of state and use it as a key prop—when the prop changes, it will trigger a re-render which will use moment with the latest locale module.
+There's something missing though. When `moment.locale()` runs it **doesn't change React's state**, so it won't re-render with the new locale. This means the formatted dates continue to display with the old moment locale. To solve this, we can track an extra bit of state and use it as a key prop—when the prop changes, it will trigger a re-render which will use moment with the latest locale module.
 
-```jsx
+```jsx{3,4,10}
 const MomentLoader = ({ children }) => {
   const { language } = useTranslations();
   // Using this as a key triggers a re-render when a new locale has loaded
@@ -238,21 +237,26 @@ It's great that we can use existing single-language bundles of shared components
 `retranslate`'s `TranslationProvider` component takes a `messages` object with translation keys for all the available languages:
 
 ```jsx
-import { TranslationProvider } from 'retranslate';
+import { TranslationProvider, Message } from 'retranslate';
  
-const App = () => (
-  <TranslationProvider messages={{
-      cs: { ctaText: 'Click me' },
-      de: { ctaText: 'Klick mich' },
-      el: { ctaText: 'κάντε κλικ με' },
-    }}
-    language="en"
-    fallbackLanguage="en"
-  ></TranslationProvider>
-);
+const App = () => {
+  const [language, setLanguage] = useState('en')
+  return (
+    <TranslationProvider messages={{
+        en: { ctaText: 'Click me' },
+        de: { ctaText: 'Klick mich' },
+        el: { ctaText: 'κάντε κλικ με' },
+      }}
+      language={language}
+      fallbackLanguage="en"
+    >
+      <Message>ctaText</Message>
+    </TranslationProvider>
+  )
+};
 ```
 
-This enables toggling between languages at any time, at the cost of downloading all translations in all languages. Most people don't need that, and the volume of this data grows exponentially as we expand globally and support more languages.
+This enables toggling between languages at any time, at the cost of downloading all translations in all languages. Most people don't need that, and the volume of this data grows exponentially as you expand to support more languages.
 
 I've started using an `<AsyncTranslationProvider />` that wraps retranslate, and like the `<MomentLoader />` downloads a new set of messages when the user changes the language.
 
@@ -281,9 +285,10 @@ const AsyncTranslationProvider = ({ requestedLanguage }) => {
 
   return (
     <TranslationProvider
-      messages={{ [language]: messages }} /* Now messages will only ever have one set of keys */
+      messages={{ [language]: messages }}
       language={language}
     >
+      {/* Now `messages` will only ever have one language */}
       {children}
     </TranslationProvider>
   )
@@ -542,13 +547,6 @@ will automatically pick up new widgets to dynamically import, without using vari
 
 ## Server-side render JIT translations
 
-
-
-
-
-
-
-
-
+TODO finish
 
 export default ({children}) => <Post {...data}>{children}</Post>
