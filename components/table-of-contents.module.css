@@ -4,6 +4,15 @@
   font-size: 1rem;
 }
 
+/*
+ * This is kinda stupid but the :nth-child
+ * helps it beat the specificity of
+ * .post h2
+*/
+.toc + *:nth-child(2) {
+  margin-top: 0;
+}
+
 .list {
   position: sticky;
   top: 5px;
