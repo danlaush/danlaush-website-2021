@@ -5,7 +5,7 @@ import Layout from "../components/layout";
 import Container from "../components/container";
 import TwoUp from "../components/two-up";
 import styles from "./index.module.css";
-import { getRoles, listPosts } from "../lib/api";
+import { getRoles, listFeaturedPosts } from "../lib/api";
 import formatDate from "../lib/formatDate";
 
 const RootIndex = ({ roles, posts }) => {
@@ -69,7 +69,7 @@ const RootIndex = ({ roles, posts }) => {
           </ul>
         </TwoUp>
 
-        <TwoUp title="Web Log">
+        <TwoUp title="Web Log" subtitle={<Link href="/posts"><a>View all</a></Link>}>
           <ul className={styles.projectsList}>
             {posts.map(({title, slug, date}) => (
               <li key={slug}>
@@ -84,7 +84,7 @@ const RootIndex = ({ roles, posts }) => {
           </ul>
         </TwoUp>
 
-        <TwoUp title="Resume" pdf>
+        <TwoUp title="Resume" subtitle={<a href="/Laush-resume.pdf">Download PDF</a>}>
           {roles.map(
             ({
               id,
@@ -125,7 +125,7 @@ const RootIndex = ({ roles, posts }) => {
 
 export const getStaticProps = async () => {
   const roles = await getRoles();
-  const posts = await listPosts();
+  const posts = await listFeaturedPosts();
   return {
     props: {
       roles,
