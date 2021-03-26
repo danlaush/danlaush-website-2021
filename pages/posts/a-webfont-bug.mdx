@@ -1,0 +1,234 @@
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+import { TableOfContents } from '../../components/table-of-contents';
+
+export const data = {
+  title: "Troubleshooting a webfont bug",
+  description: "Real-world bug stomping, and a deep dive on web font loading",
+  date: "2021-02-06",
+  featured: true,
+}
+
+export const mediaFolder = "/media/blog/a-webfont-bug";
+
+## TL;DR
+
+In the Organic Growth team at [Wise](https://wise.com/) (née TransferWise) we manage web apps for SEO—landing pages generated to rank for keyword searches. We discovered a frontend issue in the [Korean version of our Currency Converter app](https://wise.com/kr/currency-converter/), which helps web searchers know the exchange rate for a currency route. It was attempting to load our brand font from the wrong location. Confusingly, this 404 occurred **after successfully loading the font** from the correct URL.
+
+This only happened with languages where the font file did not contain the glyphs necessary for that language. For English, the browser could render all the text from the first file it downloaded. With Korean, the browser downloaded the font, realised it didn’t contain Korean characters, then went back to another `@font-face` definition and tried to download that from the erroneous URL. We solved this by transforming the first `@font-face`, and removing the second.
+
+> P.S. Interested in working at Wise? We’re hiring! Check out [open Engineering roles](https://www.wise.jobs/search/?t=Engineering).
+
+## The app: Currency Converter for SEO
+
+<Media
+  src={`${mediaFolder}/currency-converter.png`}
+  alt="Currency converter screenshot"
+  width={2136}
+  height={1464}
+/>
+
+One of the apps we manage in the Organic Growth team is a [Currency Converter](https://wise.com/gb/currency-converter/). The SEO angle of the project is to help people who search Google for "Convert GBP to USD" or "AED INR exchange rate". They get an answer to their question, and in the process learn about our product and hopefully decide to make a transfer with us. This brings in hundreds of new paying customers every month.
+
+We recently released the Currency Converter in a few new languages, in order to gauge interest in Wise in new markets. In particular for SEO, it's good to start building a search presence in a market as a first initiative, so your brand is already seeded into search results if you decide to go further. The Currency Converter is available in languages like [Thai](https://wise.com/th/currency-converter/), [Korean](https://wise.com/kr/currency-converter/), [Greek](https://wise.com/gr/currency-converter/), [Finnish](https://wise.com/fi/currency-converter/), and many more. Our brand font doesn't support all these languages, and in those cases we're happy to use the OS default.
+
+## Font file not found
+
+After launching the [Korean Currency Converter](https://wise.com/kr/currency-converter/), we noticed some 404s in the network tab for font files. Confusingly, these 404s occurred after a separate, _successful_ request for the same filenames. The font was loaded, and working. We had two questions to answer:
+
+- [ ] What caused the failing request?
+- [ ] Why did it make a second request on the Korean page?
+
+<Media
+  src={`${mediaFolder}/kr-currency-converter-network.png`}
+  alt="image of network tab showing a 200 response for Averta.woff2, and then a 404 for Averta.woff2, a 404 for Averta.woff, and a 404 for Averta.ttf"
+  width={1732}
+  height={427}
+/>
+
+The first clue was that the failed request was an incorrect location. This app's static assets are served from our CDN in a `/currency-converter-assets` folder.
+
+> Note: We should have been referencing a shared font file so future Wise pages don't re-download the same font. This has also been corrected.
+
+| Status | URL |
+|---|---|
+| ✅&nbsp;200 | `https://wise.com/currency-converter-assets/fonts/TW-Averta-Regular.woff2` |
+| ❌&nbsp;404 | `https://wise.com/kr/fonts/TW-Averta-Regular.woff2` |
+
+We looked at the page source and found the culprit in our inlined [Critical CSS](https://web.dev/extract-critical-css/). 
+
+```html
+<style type="text/css">
+@font-face {
+  font-family: Averta;
+  /* fallback fonts removed for brevity */
+  src: url(../fonts/TW-Averta-Regular.woff2) format("woff2");
+  font-weight: 500;
+}
+
+/* ...snip */
+
+@font-face {
+  font-family: Averta;
+  src: url(/currency-converter-assets/fonts/TW-Averta-Regular.woff2) format("woff2");
+  font-weight: 500;
+}
+</style>
+```
+
+We've been experimenting with Critical CSS recently. Before we started inlining these styles, they were in a `.css` file where `../fonts/` was indeed the correct folder. For our initial implementation of Critical CSS, the quickest solution was to take the relevant contents from the `.css` file and drop them into the page. This left the now-incorrect relative path in the styles. The easy fix for this was to add the second `@font-face` definition, knowing that with the CSS cascade the second would take precedence.
+
+Now that we could see the browser was requesting the incorrect font in some cases, we took the extra step to replace `../fonts` with `/currency-converter-assets/fonts` in our Gulpfile.
+
+```js
+const criticalCssBundle = () =>
+  src([
+    // Neptune is the Wise design system, and the source of the @font-face
+    "./node_modules/@transferwise/neptune-css/dist/css/neptune-core.css",
+    // Several other files
+  ])
+    .pipe(replace("../fonts/", "/currency-converter-assets/fonts/"))
+    .pipe(concat("currency-converter-critical.css"))
+    .pipe(dest(`${dist}css/`));
+```
+
+With those issues addressed, the bug was fixed. The 404 disappeared. **But... why? Why did it make a second request? Why did this only happen for some languages?** To answer this question, we have to understand more about when and why browsers download fonts.
+
+- [x] What caused the failing request?
+- [ ] Why did it make a second request on the Korean page?
+
+## When does the browser download a font?
+
+Browsers only download a font file when it's needed to display **text found on the page**. [web.dev](https://web.dev) summarises the behaviour:
+
+> 1. The browser requests the HTML document.
+> 2. The browser begins parsing the HTML response and constructing the DOM.
+> 3. The browser discovers CSS, JS, and other resources and dispatches requests.
+> 4. The browser constructs the CSSOM after all of the CSS content is received and combines it with the DOM tree to construct the render tree.
+>     - **Font requests are dispatched after the render tree indicates which font variants are needed to render the specified text on the page.**
+> 5. The browser performs layout and paints content to the screen.
+> 
+> _Source: [Optimize WebFont loading and rendering - web.dev](https://web.dev/optimize-webfont-loading/), emphasis added_
+
+So the browser figures out where all the pieces of text are, and checks that against the CSS to decide what font to paint with. The Korean page went through a multi-step fallback process, as part of step 4 in the above list.
+
+In the working example, `/gb/currency-converter`:
+
+1. Find the text `Currency Converter`
+1. Check the text against the CSSOM
+1. Determine the text should be displayed in Averta
+1. Use the _last listed_<super>*</super> `@font-face` definition for Averta to download the font file
+1. Paint!
+
+In the failing example, `/kr/currency-converter`:
+
+1. Find the text `환율계산기`
+1. Check the text against the CSSOM
+1. Determine the text should be displayed in Averta
+1. Use the _last listed_<super>*</super> `@font-face` definition for Averta to download the font file
+1. Discover this font file does not contain the necessary glyphs to paint the text
+1. Try to use the _second-to-last_ `@font-face` definition for Averta
+    1. Fail to download the first relevant `src` file, the `woff2` file (see screenshot below)
+    1. Fall back to but still fail to download the next `src` file, the `woff` file
+    1. Fall back to but still fail to download the last relevant `src` file, the `ttf` file
+1. Determine that all options to get the specified font have been exhausted
+1. Fall back to the next font specified by CSS, the Operating System's default `sans-serif` font
+1. Paint!
+
+<Media
+  src={`${mediaFolder}/kr-currency-converter-network.png`}
+  alt="image of network tab showing a 200 response for Averta.woff2, and then a 404 for Averta.woff2, a 404 for Averta.woff, and a 404 for Averta.ttf"
+  width={1732}
+  height={427}
+/>
+
+### <super>*</super>Falling back in reverse order
+
+It was interesting to us that the browser appeared to fall back through multiple `@font-face` declarations in _reverse_ order. We confirmed this by switching the order, so the correct URL was defined first and then the incorrect relative URL.
+
+```html
+<style type="text/css">
+@font-face {
+  font-family: Averta;
+  font-weight: 500;
+  src: url(/currency-converter-assets/fonts/TW-Averta-Regular.woff2);
+}
+
+/* ...snip */
+
+@font-face {
+  font-family: Averta;
+  /* fallback fonts removed for brevity */
+  src: url(../fonts/TW-Averta-Regular.woff2);
+  font-weight: 500;
+}
+</style>
+```
+
+In that case, on `/gb/currency-converter` the browser first attempted to load the `../fonts` URL, which failed, and then loaded the correct URL. This is opposite to [Jake Archibald's description](https://jakearchibald.com/2017/combining-fonts/#update-do-you-need-unicode-range) when talking about using multiple `@font-face` declarations.
+
+His core point still stands, however. This is worse for performance because the browser has to download the font to determine whether it can paint the given text with that font.
+
+The best solution would be to specify Averta's `unicode-range`, so the browser can determine whether a given string of text would be supported by the font file defined in the `@font-face` declaration. More on that in [Character sets](#character-sets) below.
+
+- [x] What caused the failing request?
+- [x] Why did it make a second request on the Korean page?
+
+## Multiple `@font-face`s
+
+It's important to know that `@font-face` was _designed_ to be used multiple times for the same font.
+
+### Variants
+
+Here at Wise we use this to define variants, like **bold** and semi-bold text. The browser is capable of taking a base font and transforming it into those variants but often they don't look great. Instead, we create multiple `@font-face` declarations for Averta to match a font file to a `font-weight`:
+
+```css
+@font-face {
+  font-weight: 500;
+  font-family: Averta;
+  src: url(/currency-converter-assets/fonts/TW-Averta-Regular.woff2);
+}
+
+@font-face {
+  font-weight: 600;
+  font-family: Averta;
+  src: url(/currency-converter-assets/fonts/TW-Averta-Semibold.woff2);
+}
+
+@font-face {
+  font-weight: 800;
+  font-family: Averta;
+  src: url(/currency-converter-assets/fonts/TW-Averta-Bold.woff2);
+}
+```
+
+Now when the browser finds some text in a `p > strong` tag, it can see from the CSSOM that the text should be painted as Averta with a font-weight of 800. It finds the third `@font-face` and triggers the font to be downloaded. If no bold text is used on the page, the font isn't downloaded. On the flip side, if it finds italic text (which we don't use in our design system), the browser won't find a matching `@font-face` and will manually transform the next-closest font to pseudo-italics.
+
+### Character sets
+
+A font file that supports every language—every glyph in every character set—would be massive. Instead, developers can set `@font-face` for a specific set of Unicode characters. The following example is from [CSS-Tricks](https://css-tricks.com/almanac/properties/u/unicode-range/):
+
+```css
+@font-face {
+  font-family: 'MyWebFont';
+  src:  url('myfont.woff2') format('woff2');
+  unicode-range: U+00-FF; /* Define the available characters */
+}
+```
+
+A common way to split up fonts is by _script_, so you can have one font file for Latin characters, one for Cyrillic characters, one for Chinese glyphs, one for Devanagari languages like Hindi, and so on. The developer can create a `@font-face` declaration for each of these separated font files with the same `font-family`, and the browser will figure out which ones are needed for the current text of the page.
+
+### Other special tricks
+
+This feature can be leveraged in interesting and novel ways. Jake Archibald uses it to replace [_just two characters_](https://jakearchibald.com/2017/combining-fonts/) from a font he otherwise likes. 
+
+I've also seen it used by font foundries to discourage pirating. The copyrighted font is split up into multiple files with arbitrary sets of characters, and provides developers with a JavaScript loader that will download the files from the foundry. This was the knowledge that unlocked the source of this bug for us, knowing that one font can be broken up into multiple files and requested at runtime.
+
+## Conclusion
+
+Our major takeaway from this experience was to test more rigorously before releasing new languages. We learned that the browser is actually quite smart about downloading font files, and that we should optimise the user experience by adding a unicode-range to our font face definitions.
+
+> P.S. Interested in working with Wise? We’re hiring! Check out [open Engineering roles](https://www.wise.jobs/search/?t=Engineering).
+
+
+export default ({children}) => <Post {...data}>{children}</Post>
