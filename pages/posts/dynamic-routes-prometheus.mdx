@@ -1,0 +1,109 @@
+import Post from '../../components/post';
+import TwoUp from '../../components/two-up';
+import { Media } from '../../components/media';
+
+export const data = {
+  title: "Normalizing Next.js dynamic routes for Prometheus tracking",
+  date: "2021-04-02",
+}
+
+At [Wise](http://wise.com/) we use [Promster](https://github.com/tdeekens/promster) to monitor our Next.js apps, but ran into an issue with dynamic routes. We were generating too much noise and we risked crashing Prometheus and Grafana. We used Promster's `normalizePath` config with Next.js app data to condense the data, which improved how useful our monitoring was. Requests were segmented by _route template_ instead of URL.
+
+Instead of separating metrics about requests for `/gb/compare/travel-money` and `/us/compare/travel-money`, we have metrics for the route in our pages folder `/[urlLocale]/compare/travel-money`. Requests for CMS pages are handled by the catch-all route `/[...slug]`, and are combined in Prometheus.
+
+This makes sense for monitoring because from the app's perspective there's no difference between 2 CMS pages. We want our monitoring to help us understand where things are going wrong _in the app_, even if the error was caused by invalid CMS config on a specific page. For some apps the default Promster settings are enough: routes with a dynamic number are automatically normalized, but for dynamic strings it has to be taught how to bucket those requests into useful data.
+
+## Promster config
+
+The core way we accomplish this is through a function passed to Promster config. We're given the requested path and associated Express request and response, and we decide what to call it for Prometheus and return it.
+
+```js
+// Promster options object
+{
+  normalizePath: (path, { req, res }) => {
+    return path
+  }
+}
+```
+
+So how do we match a requested path to something in our Next.js pages/ folder? For the first step we're taking a shortcut: at Wise, our custom Express server attaches the Next server instance to res.locals so it can be accessed by future middleware. There might be other ways to achieve this step.
+
+## Pages manifest for static routes
+
+The Next app has 2 key properties that will help us. The first is the pagesManifest  which is an object with all routes as keys. 
+
+```json
+// Example pagesManifest
+{
+  "/preview": "pages/preview.js",
+  "/[urlLocale]/compare/travel-money": "pages/[urlLocale]/compare/travel-money.js",
+}
+```
+
+We can use this to first see if the requested path exactly matches one of our routes. If yes, return that path. We'll use this opportunity to remove any query params from the request, which also aren't necessary for Prometheus.
+
+```js{3,4,5,6,7,8,9,10,11,12}
+{
+  normalizePath: (path, { req, res }) => {
+    const {
+      pagesManifest,
+    } = res.locals.nextApp
+    const pathWithoutQueryString = path.replace(/\?.+/, "")
+    
+    if (!!pagesManifest[pathWithoutQueryString]) {
+      return pathWithoutQueryString
+    }
+
+    return pathWithoutQueryString
+  }
+}
+```
+
+## Dynamic routes
+
+Next.js needs to convert a requested path to a route template to render the page, and fortunately we're able to leverage its existing functionality for our Prometheus normalization. In addition to the page manifest, the Next instance has a `dynamicRoutes` array with regular expression matching functions to determine whether the requested path belongs to that route template. The array appears to be sorted in order of specificity: catch-all routes appeared after single-variable dynamic routes.
+
+```js
+// Example dynamicRoutes
+[
+ {
+    page: '/[urlLocale]/compare/travel-money',
+    match: function(){} // If matching, returns e.g. { urlLocale: 'gb' }
+  },
+  {
+    page: '/[...slug]',
+    match: function(){},
+  }
+]
+```
+
+We can loop through these routes, and check if the `pathWithoutQueryString` belongs to each route. Once it finds a match, that's the route to send to Prometheus.
+
+```js{5,13,14,15,16,17,19}
+{
+  normalizePath: (path, { req, res }) => {
+    const {
+      pagesManifest,
+      dynamicRoutes,
+    } = res.locals.nextApp
+    const pathWithoutQueryString = path.replace(/\?.+/, "")
+    
+    if (!!pagesManifest[pathWithoutQueryString]) {
+      return pathWithoutQueryString
+    }
+
+    for (const route of dynamicRoutes) {
+      if (!!route.match(pathWithoutQueryString)) {
+        return route.page;
+      }
+    }
+
+    // keep this just in case, but everything should be caught by [...slug]
+    return pathWithoutQueryString
+  }
+}
+```
+
+With this, we started getting data into Grafana sorted by route template.
+
+export default ({children}) => <Post {...data}>{children}</Post>
