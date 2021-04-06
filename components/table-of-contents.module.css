@@ -1,6 +1,6 @@
 .toc {
   grid-row: 1/span 1000;
-  grid-column: 1/1!important;
+  grid-column: 2/2!important;
   font-size: 1rem;
 }
 
@@ -9,6 +9,10 @@
  * helps it beat the specificity of
  * .post h2
 */
+.toc + *:nth-child(2) {
+  margin-top: 4rem;
+}
+
 @media screen and (min-width: 768px) {
   .toc + *:nth-child(2) {
     margin-top: 0;
@@ -26,6 +30,12 @@
   color: var(--color-grey-mid);
   font-size: 1.2rem !important;
   margin-top: 0.8rem !important;
+}
+
+@media screen and (min-width: 768px) {
+  .title {
+    margin-bottom: 2.6rem;
+  }
 }
 
 .list {

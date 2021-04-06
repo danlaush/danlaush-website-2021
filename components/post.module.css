@@ -2,7 +2,7 @@
   max-width: calc(var(--sidebar-width) + var(--content-width));
   line-height: 1.5;
   font-size: 1.3rem;
-  grid-template-columns: var(--sidebar-width) auto;
+  grid-template-columns: auto var(--sidebar-width);
   grid-column-gap: 1.5rem;
 }
 
@@ -13,10 +13,9 @@
   }
 }
 
-
 .post > * {
   margin: 0;
-  grid-column: 2 / 2;
+  grid-column: 1 / 1;
 }
 
 .post > * + * {
@@ -54,11 +53,25 @@
 
 .post h2 {
   margin-top: 4rem;
-  font-size: 1.95rem;
+  font-size: 1.5rem;
+}
+
+.post h2:first-child {
+  margin-top: 0;
 }
 
 .post h2 code {
-  font-size: 1.95rem;
+  font-size: 1.5rem;
+}
+
+@media screen and (min-width: 768px) {
+  .post h2 {
+    font-size: 1.95rem;
+  }
+
+  .post h2 code {
+    font-size: 1.95rem;
+  }
 }
 
 .post h3 {

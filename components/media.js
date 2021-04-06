@@ -13,7 +13,7 @@ const Media = ({src, alt, width, height, caption, sizes}) => (
         sizes={sizes}
         />
     </div>
-    <p className={styles.caption}>{caption}</p>
+    {caption && <p className={styles.caption}>{caption}</p>}
   </>
 )
 
