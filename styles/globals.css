@@ -61,7 +61,7 @@ body {
   color: var(--color-grey-dark);
 }
 
-a {
+a[href] {
   color: var(--color-highlight);
 }
 

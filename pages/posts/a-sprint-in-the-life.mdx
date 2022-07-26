@@ -1,0 +1,69 @@
+import Post from '../../components/post';
+import TwoUp from '../../components/two-up';
+import { Media } from '../../components/media';
+
+export const data = {
+  title: "A sprint in the life of Organic Growth",
+  date: "2022-07-26",
+}
+
+export const mediaFolder = "/media/blog/a-sprint-in-the-life";
+
+export default ({children}) => <Post {...data}>{children}</Post>
+
+> Summary: A story of two weeks for the Organic Growth team—what it's like to be on our team. What we work on, the challenges we face, the wins we share, and how we're constantly evolving. Every team in Wise runs a bit differently; this is our story.
+
+<Media
+  src={`${mediaFolder}/organicgrowth.jpg`}
+  alt="A field of growing flowers and plants"
+  width={1600}
+  height={1000}
+/>
+
+In the Organic Growth team, we work toward the Wise mission of making international money movement eventually free by bringing down the cost of new user acquisition. Marketing costs money, so we use engineering to make sure we grow in a scalable, sustainable way. We build data integrations for marketing channels, scale out SEO landing page ideas, provide a CMS for other teams to build their own landing pages, and more.
+
+**Jump to**: <a href="#sprint-planning">sprint planning</a>, <a href="#story-points">story points</a>, <a href="#standup">standup</a>, <a href="#cross-team">cross-team</a>, <a href="#autonomous-teams">autonomous teams</a>, <a href="#ten-percent">10% time</a>, <a href="#office-cadence">office vs WFH</a>, <a href="#launch">feature launch</a>, <a href="#on-call">on-call</a>, <a href="#bug">bugfixing</a>, <a href="#backlog">backlog</a>, <a href="#retro">retro</a>
+
+It's **Monday**. A fresh start. For our team of 6 devs we kick things off by paying down some tech debt. To keep our products running smoothly for customers, we set aside half a day every week to update dependencies, address vulnerabilities, and fix noisy alerts.
+
+After lunch we get together for our Landscape Design<a href="#footnote-1">¹</a> meeting (<a id="sprint-planning">Sprint Planning</a>) to decide what our priorities are for the next two weeks. Until a few months ago we ran things closer to Kanban-style rolling weekly updates. In a team retro we concluded that it was feeling difficult to commit to bigger tasks, so we trialled a two-week planning cadence and it just felt right.
+
+In the meeting we spend time on each of our key projects. We look at the project's backlog in Jira, which has a list of upcoming tasks with <a id="story-points">Story Points</a> already set. The project lead lays out the next phase of the work and after discussion we drag a handful of tickets into the sprint-a gut feel of what we think is achievable for the group working on that project. When we've talked about all the projects we look at the total number of Story Points and compare that to our velocity for the past few sprints. It's nothing scientific, but it's a good sense check to compare the gut feeling against. We schedule an hour for the meeting, but it more commonly takes about 40 minutes. Then we crack on with the work.
+
+**Tuesday** now. Today and the rest of the week we have a 15–30 minute team <a id="standup">standup</a> at 10am. We step through in-progress tickets on the Jira board, most importantly checking who is blocked (waiting on someone else). A task could need code review, a response from another team, or unexpected complexity that requires a project team discussion. The blockers hopefully aren't a surprise. We communicate regularly on Slack and don't wait for standup to say when we need help, but the meeting is a good backstop for when we get busy and forget who needs support.
+
+We realise on **Wednesday** we have to <a id="cross-team">re-think</a> our plan for a particular new feature. We're getting our feet wet in a new domain area, known to Wise but new for our team, and while the overall product plan has remained consistent we realise we need to pivot our implementation. As we get familiar with services belonging to other teams, we learn what changes are needed to work for our use case.
+
+We have a strong culture of <a id="autonomous-teams">autonomous teams</a> at Wise. This lets us move quickly when an idea is fully under our control, but it can make cross-team collaboration difficult. Complex domain areas aren't always documented well enough for another team to swing by and drop off a couple PRs. This can lead to lots of messages and meetings getting everyone on the same page about how something works now, in order for us to decide the changes required to support our new service. As we mature, our Engineering Experience team is working on making topics and services more discoverable to make sure engineers can spend their time getting things done.
+
+**Thursday** is our devs' favourite day of the sprint: Greenhouse Day<a href="#footnote-1">¹</a>, our team's free <a id="ten-percent">"10% time"</a> to spend on training/learning, fixing that bug that's been bothering you, building a proof of concept, watching conference videos, you name it. In the afternoon we get together and tell each other about what we've learned or done. Here's the real list of what we did this Greenhouse day:
+- Learned about colour palettes in Refactoring UI, applied to a personal website
+- Learned about ML, spun up an image classifier and webcam object identifier
+- Learned some Go, showed us a REPL with some of its useful language features
+- Learned about feign clients to apply in an upcoming work project
+- Learned some React Native, built a Wordle clone
+
+We made it to **Friday**, when the team heads <a id="office-cadence">into the office</a>. Teams at Wise choose what amount of in-person time works for them. Some months ago, our team discussed what we liked about working from home and what we liked about working from the office. One day per week together felt like the right cadence. It's nice to share the office's free Friday lunch. Our apprentices and juniors feel more comfortable asking for help in-person than over Slack. Sometimes we'll spend our fun budget on an activity together in the afternoon, so we can bond as a team and still go home on time. We have one team member overseas, who still joins remotely on those Fridays. Our remotie comes to the London office every once in a while, and in those weeks we tend to concentrate fun together-time and deeper planning discussions which flow more easily in person.
+
+The next **Monday** starts with tech debt bashing in the morning like last week, but instead of Sprint Planning in the afternoon we have a normal standup.
+
+We're ready to <a id="launch">launch</a> a new feature on **Tuesday**, which is exciting. Several months worth of work are ready to go! All the code has been in production for a while and we're confident it works, so it's just the matter of slowly rolling it out to users. No big-bang releases here - we ship new code several times a day and unlock features to users when we're ready. It can feel anti-climactic to "release" to only 1% of users after pushing so hard, but we focus on stability and the slow rollout helps us stay on top of bugs.
+
+On **Wednesday** our <a id="on-call">on-call</a> person for the week has to set aside project work to fix a bug. Different teams in Wise have different on-call needs. Our area only requires support during business hours and our services are pretty stable, so the on-call's main responsibility is responding to questions and feature requests from other internal teams. This ensures everyone else can stay focused on their top priorities.
+
+In this case, we shipped a CSS <a id="bug">bug</a>: some missing styles are making a feature unusable. A customer support agent lets us know about the issue in Slack, and the on-call looks into it. After a triage, the on-call decides it will be quick enough to fix forward instead of rolling back, then works to solve the issue which we release as soon as its ready. We're in the process of migrating the offending app to a new tech stack, which will allow us to create more comprehensive end-to-end tests and visual regression tests which will give us confidence this won't happen again.
+
+**Friday**, our final day of the sprint and back in the office together. It's been a good one, full of ups and downs. After team lunch, we get together for two separate meetings: <a id="backlog">Backlog</a> Gardening<a href="#footnote-1">¹</a> and <a id="retro">Retro</a>. In Gardening, we look through new tickets which have been added to our backlog in the previous two weeks. Sometimes they're tickets one of us has created as a reminder to ourselves, others are requests from other teams. In the meeting we make sure everyone understands what the definition of done is for the ticket and the overall approach required to solve the problem. Sometimes after discussion we realise the issue is already solved or the work is no longer required, which is nice.
+
+We mix up the details of our Retro meeting every few sprints, but the structure is the same: reflecting on the past two weeks, writing (digital) post-it notes of the highlights and lowlights, voting on which of the notes we think are the most important, and discussing the most-upvoted notes. This time we talk about sprint planning, and decide to try something different-since not everyone works on every project, we'll trial a process where each project team syncs up to decide plans for the sprint. You'll have one, maybe two 20 minute meetings on a topic directly relevant to you.
+
+---
+
+And that's it! What a sprint. Thanks for sticking with us. We do good work in Organic Growth and what makes us strong is that everyone has a voice in the discussion. We're always introspecting about how we feel things are going and trying out new ideas to see how we can build Wise better.
+
+Onwards 🚀
+
+---
+
+## Footnote
+- <a id="footnote-1">¹</a> As the Organic Growth team, we've ended up naming our rituals after references to growing and planting. Sprint Planning = Landscape Design, 10% time = Greenhouse Day, Backlog Grooming = Backlog Gardening.
