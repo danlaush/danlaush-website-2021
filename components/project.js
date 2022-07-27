@@ -10,6 +10,7 @@ const Project = ({ title, description, media, children, breadcrumb }) => {
       description={description}
       media={media}
       breadcrumb={breadcrumb || true}
+      typeIsArticle
     >
       <Container>
         {description && (

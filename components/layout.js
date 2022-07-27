@@ -3,12 +3,15 @@ import Head from 'next/head'
 import PageHeader from './page-header';
 import PageFooter from './page-footer'
 
-const Layout = ({ children, title, description, media, link, breadcrumb, htmlTitle }) => (
+const Layout = ({ children, title, description, media, link, breadcrumb, htmlTitle, url, typeIsArticle }) => (
   <>
     <Head>
       <title>{htmlTitle || title} | Dan Laush</title>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta property="og:url" content={`https://danlaush.biz${url}`} />
       <meta property="og:site_name" content="Dan Laush" />
+      <meta property="og:type" content={typeIsArticle ? 'article' : 'website'} />
+      <meta property="twitter:card" content="summary_large_image"></meta>
       <meta property="og:title" content={htmlTitle || title} />
       <meta name="twitter:title" content={htmlTitle || title} />
       <meta name="theme-color" content="#7E4AD1"></meta>

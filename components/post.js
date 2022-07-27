@@ -12,6 +12,7 @@ const Post = ({ title, date, children, description, media }) => {
       breadcrumb={{ url: "/posts", text: "Web log"}}
       description={`${formatDate(date)}${description ? `—${description}` : ''}`}
       media={media ? media : undefined}
+      typeIsArticle
     >
       <Container>
         <div className={styles.post}>{children}</div>
