@@ -2,16 +2,16 @@ import Post from '../../components/post';
 import TwoUp from '../../components/two-up';
 import { Media } from '../../components/media';
 
+export const mediaFolder = "/media/blog/a-sprint-in-the-life";
+
 export const data = {
   title: "A sprint in the life of Organic Growth",
   date: "2022-07-26",
+  description: "A story of two weeks in our team: what we work on and how we're constantly evolving. Every team in Wise runs a bit differently; this is our story.",
+  media: `${mediaFolder}/organicgrowth.jpg`
 }
 
-export const mediaFolder = "/media/blog/a-sprint-in-the-life";
-
 export default ({children}) => <Post {...data}>{children}</Post>
-
-> Summary: A story of two weeks for the Organic Growth team—what it's like to be on our team. What we work on, the challenges we face, the wins we share, and how we're constantly evolving. Every team in Wise runs a bit differently; this is our story.
 
 <Media
   src={`${mediaFolder}/organicgrowth.jpg`}
