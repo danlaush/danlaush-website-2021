@@ -1,0 +1,112 @@
+import Post from '../../components/post.js';
+import { TableOfContents } from '../../components/table-of-contents';
+import { Media } from '../../components/media';
+
+export const data = {
+  title: "Side project Postmortem: Google Photos API sync experiment",
+  date: "2022-11-06",
+}
+
+export const mediaFolder = "/media/blog/photos-sync-experiment";
+
+export default ({children}) => <Post {...data}>{children}</Post>
+
+> I wanted to create a simple solution to add certain media from my Google Photos account to a particular album on a schedule. I used [replit.com](https://replit.com) to code and run the server, set up a barebones OAuth flow to store an access token for offline use, but was stymied at the finish line because I didn't read the Google Photos API documentation in detail and it doesn't support what I was trying to achieve. Oops. RTFM, folks. Read it before you need it.
+
+## Project idea: capturing vignettes
+Recently I realised that I wasn't feeling like my photos were capturing the essence of the experience. They just felt too flat, when the scenery in front of me had so much life and motion in it. I've been taking a lot of ~10-second videos - held still like a photo, but with subtle movement of elements in the scene and gentle background noise.
+
+<a href="https://photos.app.goo.gl/Jo5ruxkwXHEZQdqE7">
+  <Media
+    src={`${mediaFolder}/vignette.jpg`}
+    alt="View of the beach in tropical north Australia"
+    width={3359}
+    height={1871}
+  />
+</a>
+
+I take a fair amount of these over the weeks, especially while traveling but also while out riding my bike or a nice moment on the way to work. I wanted to use the Google Photos API to automatically collect all my vignette videos, making it easy to flip through them and watch the seasons go by.
+
+## Getting online quickly with Replit
+
+<iframe frameborder="0" width="100%" height="500px" src="https://replit.com/@danlaush/ExperimentPortlySuddenContent?embed=true"></iframe>
+
+To achieve this I wanted a Node server. I needed a headless machine that could operate this behaviour independently. With side projects I aim for ultra-minimal setups, particularly for infrastructure which isn't a strength of mine. I thought I'd give replit.com a try since I understood it to be an all-in-one tool for getting code out into the world, and I was particularly interested to try using it from my iPad. I was able to get an Express server up and running pretty quickly.
+
+### Like Codepen with a Node server
+There was a lot I liked about replit. In terms of raw time, going from having the idea → writing code → server accessible at a URL, probably the fastest overall turnaround I've ever had. Write code, click "Run", it automatically installs NPM packages you reference and boots you up a console and web browser.
+[replit screenshot]
+I used the database and secrets for a few different things, and they worked nicely. Like Codepen, the free account means your code is all public. I was always a bit nervous I'd accidentally publish something unintentional in the codebase, like an API key or PII, but for a hacky proof of concept it didn't feel worth paying for privacy. 
+
+### Serverless?
+Another infrastructure solution for this could have been serverless functions, but I've poked into offerings for that before and found them confusing and difficult to get going with. I'm sure they're super helpful once you get up and running, but the replit developer experience made this experiment dead easy.
+
+<a href="https://photos.app.goo.gl/6DwvhAUYFh9nSvkR6">
+  <Media
+    src={`${mediaFolder}/vignette2.jpg`}
+    alt="A panorama of the Swiss Alps"
+    width={3349}
+    height={1870}
+  />
+</a>
+
+## MVP feature set
+To make this happen, there were a few distinct requirements.
+1. Code execution on a schedule
+2. OAuth connection to access Google APIs
+3. The "business logic", the automated album builder script
+
+### 1. Scheduled scripting
+Replit servers shut themselves down 1 hour after their last web request so I wouldn't be able to use `cron` to run the command once a day.  They spin up again when requested, and from Googling it seems common to use the scheduling of Uptime Robot to ping a Replit URL. This will trigger code execution on the server, which is what we want.
+
+As long as the triggering web request is only used to kick off an async job, without relying on that request to provide any authorisation or providing back any information besides the state of the job, then it should be safe to leave as a public URL.
+
+### 2. Bare minimum OAuth [revise/condense]
+Working with Google APIs requires an OAuth access token. Thanks to Tom Nagle's article [Google OAuth With Node.js — Without Passport](https://tomanagle.medium.com/google-oauth-with-node-js-4bff90180fe6), I finally *get* OAuth. There is a simple core you can extract, a few functions that perform the dance steps necessary to ask Google APIs for data.
+
+> There are plenty of NPM modules which make setting up an OAuth session easy like [Passport](https://www.passportjs.org/), BUT most of these packages assume you want to use OAuth to allow anyone to log into your web app. They expect you to use Express sessions, and have a database to store user information and session tokens.
+> 
+> My app has one user. I want the least amount of complexity possible. I found the tools overwhelming because I would've needed to use everything in a non-standard way. I didn't understand the underlying core of OAuth very well, which made that challenging. 
+
+My OAuth callback endpoint is publicly accessible, but the Google API project only allows my email address to authenticate so it's totally non-functional for anyone else. I generate an 'offline' access token which I store in the replit database. The business logic sync script looks for that access token to make authenticated requests to the Google Photos API. I didn't get as far as setting this up, but the system would be able to use a 'refresh' token when the original expires to keep the session alive for quite a long time. I need to go through the Google OAuth flow in the browser once, but after that the automated sync should have the access it needs.
+
+### 3. The actual album syncing script
+The business logic isn't very complex. Once a day:
+1. Fetch all media added in the last 24 hours
+2. Pick out all 8- to 20-second landscape-orientation videos
+3. Add them to my "Vignettes" album
+
+<a href="https://photos.app.goo.gl/2KVm2JsYEqTpKdnB7">
+  <Media
+    src={`${mediaFolder}/vignette3.jpg`}
+    alt="View from a moving steam train, looking closely at the boiler"
+    width={3359}
+    height={1869}
+  />
+</a>
+
+## The problem
+Unfortunately, because I did all of this work in order I realised too late that #3.2 was only half-possible and #3.3 impossible. I made assumptions about what the Google Photos API would provide. 
+- (#2) While I was able to filter media results by date, orientation, and file type (photo/video), the metadata does not include video length. Adding all my videos from the day is better than nothing, but to curate this album would require a manual cleanup step which IMO defeats the point.
+- (#3) The thing that broke the project was the Google API requirements for adding a photo to album.
+
+> Note that you can only add media items that have been [uploaded by your application](https://developers.google.com/photos/library/guides/upload-media) to [albums that your application has created](https://developers.google.com/photos/library/guides/manage-albums#creating-new-album).
+> 
+> [Developer guide](https://developers.google.com/photos/library/guides/manage-albums#creating-new-album)
+
+💀
+
+My application isn't uploading the images—I'm scanning things uploaded by my phone; my API project can't complete the core task, the use case that got me into this project. I suppose I could do something drastic like delete and re-upload the videos but that seems over the top. Feels risky, like it could mess up my Google Photos timeline somehow.
+
+---
+
+**Conclusion:** I halted the project here. Would be interested to hear if you have a sensible, minimal way I can solve this problem!
+
+<a href="https://photos.app.goo.gl/wsGLJDcfZinMDEKo9">
+  <Media
+    src={`${mediaFolder}/vignette4.jpg`}
+    alt="View from a boat on the lake looking at the mountains"
+    width={3359}
+    height={1875}
+  />
+</a>
