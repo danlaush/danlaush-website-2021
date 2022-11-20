@@ -1,0 +1,13 @@
+.title {
+  width: 100%;
+  overflow: hidden;
+}
+
+.title pre {
+  white-space: pre-wrap;
+}
+
+.stacktrace {
+  font-family: monospace;
+  font-size: 12px;
+}

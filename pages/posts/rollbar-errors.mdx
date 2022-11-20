@@ -1,0 +1,25 @@
+import Post from '../../components/post.js';
+// import { TableOfContents } from '../../components/table-of-contents';
+import { Media } from '../../components/media';
+import ErrorViewer from '../../components/rollbar-errors/error-viewer.js';
+
+export const data = {
+  title: "Rollbar Errors (WIP)",
+  description: "Why can't I hold all these limes",
+  date: "2022-11-14",
+}
+
+// export const mediaFolder = "/media/blog/photos-sync-experiment";
+
+export default ({children}) => <Post {...data}>{children}</Post>
+
+⚠️ If you, dear reader, come from google in the future seeking a solution to your Rollbar error, I fear you will find no comfort here. This is a collection of problems I haven't solved. Best of luck. ⚠️ 
+
+When working on frontend projects, it's important to know what our users are experiencing. Our tools can tell us immediately when something goes wrong without having to wait for someone to report an error. Every time someone experiences a problem we should be able to help that user recover and ensure it nevers happens again, but realistically the variety of errors reported by our tools vary in clarity and utility. Software has so many moving parts! Some of them make noise and sometimes the alerts don't warrant a response. Some alerts have no impact on the user or us. Some are out of our control. Some are important and should be fixed, but either seem innocent or don't appear serious.
+
+Some of these errors can be useful for us to know about, as they are sometimes failures in scripts loaded by Google Tag Manager which I actually care about (but don’t know everything about the contents of, that’s managed by another team)
+
+## Errors
+This is a selection of errors I've gotten in my frontend projects (collected by Rollbar). I haven't dug too deep into these. Some of them may have simple solutions, but they come up infrequently enough that it's hard to justify spending any time at all debugging each one. They don't come up often enough for me to spend the time getting to the bottom of what's causing the error. It's another red light going off on my monitor that I have to just ignore.
+
+<ErrorViewer />
