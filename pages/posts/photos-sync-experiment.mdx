@@ -3,7 +3,7 @@ import { TableOfContents } from '../../components/table-of-contents';
 import { Media } from '../../components/media';
 
 export const data = {
-  title: "Side Project Postmortem: Google Photos API experiment",
+  title: "Side Project Postmortem\: Google Photos API experiment",
   description: "In which the author learns to measure twice, cut once",
   date: "2022-11-06",
   featured: true,
@@ -15,14 +15,14 @@ export default ({children}) => <Post {...data}>{children}</Post>
 
 I wanted to automatically add certain media from my Google Photos account to a particular album. I used [replit.com](https://replit.com) to code and run the server, set up a barebones OAuth flow to store an access token for offline use, but was **stymied at the finish line because I didn't read the Google Photos API documentation** in detail and it doesn't support what I was trying to achieve. Oops. RTFM, folks. Read it before you need it.
 
-<p><a href="https://photos.app.goo.gl/Jo5ruxkwXHEZQdqE7" className="gp-video-link">
+<a href="https://photos.app.goo.gl/Jo5ruxkwXHEZQdqE7" className="gp-video-link">
   <Media
     src={`${mediaFolder}/vignette.jpg`}
     alt="View of the beach in tropical north Australia"
     width={3359}
     height={1871}
   />
-</a></p>
+</a>
 
 ## Project idea: capturing vignettes
 I love capturing the moment with my camera, but photos always feel flat when the scenery in front of me has so much life and motion in it. Instead I've been taking ~10-second videos - held still like a photo, but with subtle movement of elements in the scene and gentle background noise. I call them "vignettes".
@@ -31,13 +31,13 @@ I take a fair amount of these over the weeks, especially while traveling but als
 
 ## Getting online quickly with Replit
 
-<p><Media
+<Media
   src={`${mediaFolder}/replit.png`}
   alt="Screenshot of replit development environment, showing an IDE, console and web view in a browser tab"
   width={2360}
   height={1640}
   caption={<>Check out <a href="https://replit.com/@danlaush/ExperimentPortlySuddenContent">my public replit</a>.</>}
-/></p>
+/>
 
 To achieve this I needed a headless machine that could operate this behaviour independently. With side projects I aim for ultra-minimal setups, particularly for infrastructure which isn't a strength of mine. I thought I'd give replit.com a try since I understood it to be an all-in-one tool for getting code out into the world, and I was particularly interested to try using it from my iPad. I was able to get a Node + Express server up and running pretty quickly.
 
@@ -49,14 +49,14 @@ I used Replit's database and secrets features for a few different things, and th
 ### Serverless?
 Another infrastructure solution for this could have been serverless functions. I've poked into offerings for that before and found them confusing and difficult to get going with. I'm sure they're super helpful once you're up and running, but the replit developer experience made this experiment dead easy.
 
-<p><a href="https://photos.app.goo.gl/6DwvhAUYFh9nSvkR6" className="gp-video-link">
+<a href="https://photos.app.goo.gl/6DwvhAUYFh9nSvkR6" className="gp-video-link">
   <Media
     src={`${mediaFolder}/vignette2.jpg`}
     alt="A panorama of the Swiss Alps"
     width={3349}
     height={1870}
   />
-</a></p>
+</a>
 
 ## MVP feature set
 To make this happen, there were a few distinct requirements.
@@ -85,14 +85,14 @@ The business logic isn't very complex. Once per day:
 2. Pick out all 8- to 20-second landscape-orientation videos
 3. Add them to my "Vignettes" album
 
-<p><a href="https://photos.app.goo.gl/2KVm2JsYEqTpKdnB7" className="gp-video-link">
+<a href="https://photos.app.goo.gl/2KVm2JsYEqTpKdnB7" className="gp-video-link">
   <Media
     src={`${mediaFolder}/vignette3.jpg`}
     alt="View from a moving steam train, looking closely at the boiler"
     width={3359}
     height={1869}
   />
-</a></p>
+</a>
 
 ## The problem
 Unfortunately, because I did all of this work in order, I realised too late that #3.2 was only half-possible and #3.3 impossible. I made assumptions about what the Google Photos API would provide. 
@@ -111,11 +111,11 @@ My application isn't uploading the images—I'm scanning things uploaded by my p
 
 **Conclusion:** I halted the project here. Was a fun experiment, but not everything works out. Would be interested to hear if you have a sensible, minimal way I can solve this problem.
 
-<p><a href="https://photos.app.goo.gl/wsGLJDcfZinMDEKo9" className="gp-video-link">
+<a href="https://photos.app.goo.gl/wsGLJDcfZinMDEKo9" className="gp-video-link">
   <Media
     src={`${mediaFolder}/vignette4.jpg`}
     alt="View from a boat on the lake looking at the mountains"
     width={3359}
     height={1875}
   />
-</a></p>
+</a>

@@ -17,6 +17,7 @@
   outline: 2px solid lightgrey;
   background-color: lightgrey;
   line-height: 0;
+  position: relative;
 }
 
 .caption {

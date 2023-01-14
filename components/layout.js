@@ -6,7 +6,7 @@ import PageFooter from './page-footer'
 const Layout = ({ children, title, description, media, link, breadcrumb, htmlTitle, url, typeIsArticle }) => (
   <>
     <Head>
-      <title>{htmlTitle || title} | Dan Laush</title>
+      <title>{`${htmlTitle || title} | Dan Laush`}</title>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta property="og:url" content={`https://danlaush.biz${url}`} />
       <meta property="og:site_name" content="Dan Laush" />

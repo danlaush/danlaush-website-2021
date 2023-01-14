@@ -3,17 +3,19 @@ import styles from './media.module.css';
 
 const Media = ({src, alt, width, height, caption, sizes}) => (
   <>
-    <div className={styles.mediaContainer}>
+    <div className={styles.mediaContainer}
+      style={{
+        aspectRatio: width / height
+      }}
+    >
       <Image
         src={src}
         alt={alt}
-        width={width}
-        height={height}
-        layout="responsive"
         sizes={sizes}
+        fill
         />
     </div>
-    {caption && <p className={styles.caption}>{caption}</p>}
+    {caption && <span className={styles.caption}>{caption}</span>}
   </>
 )
 
