@@ -1,0 +1,53 @@
+{
+  "item_counter": 2569,
+  "traces": [
+    {
+      "frames": [
+        {
+          "filename": "safari-extension://596A1A39-1277-434C-946A-19B1A56E1F93/Honey.safariextension/h1-vendors-main-popover.js",
+          "lineno": 76,
+          "colno": 52053,
+          "method": "[anonymous]"
+        },
+        {
+          "filename": "safari-extension://596A1A39-1277-434C-946A-19B1A56E1F93/Honey.safariextension/h1-vendors-main-popover.js",
+          "lineno": 120,
+          "colno": 20454,
+          "method": "u"
+        },
+        {
+          "filename": "safari-extension://596A1A39-1277-434C-946A-19B1A56E1F93/Honey.safariextension/h1-vendors-main-popover.js",
+          "lineno": 120,
+          "colno": 20204,
+          "method": "[anonymous]"
+        },
+        {
+          "filename": "safari-extension://596A1A39-1277-434C-946A-19B1A56E1F93/Honey.safariextension/h1-vendors-main-popover.js",
+          "lineno": 76,
+          "colno": 52827,
+          "method": "r"
+        },
+        {
+          "filename": "safari-extension://596A1A39-1277-434C-946A-19B1A56E1F93/Honey.safariextension/h1-vendors-main-popover.js",
+          "lineno": 76,
+          "colno": 52923,
+          "method": "[anonymous]"
+        },
+        {
+          "try_code_context": null,
+          "raw_item_code_context": null,
+          "filename": "[native code]",
+          "lineno": null,
+          "scm_link": null,
+          "method": "promiseReactionJob"
+        }
+      ],
+      "exception": {
+        "message": "null is not an object (evaluating 'a[w.checkoutSettingKeys.devToolsEnabled]')",
+        "class": "TypeError",
+        "description": "null is not an object (evaluating 'a[w.checkoutSettingKeys.devToolsEnabled]')"
+      }
+    }
+  ],
+  "children": null
+}
