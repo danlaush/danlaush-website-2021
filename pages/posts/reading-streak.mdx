@@ -1,0 +1,40 @@
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+import ReadingStreak from '../../components/reading-streak';
+
+export const data = {
+  title: "My reading streak does not spark joy",
+  date: "2023-02-19",
+}
+
+export const mediaFolder = "/media/reading-streak";
+
+<Media
+  src={`${mediaFolder}/all.png`}
+  alt="A screenshot showing 4 years of my reading streak, from Kindle Insights"
+  width={1602}
+  height={1390}
+/>
+
+I read books on the Kindle app on my phone. It's a funny choice, I admit. I love the smell of paper in Real Books as much as anyone but I can't be bothered lugging dead trees around. I even have a Kindle reader but I never use it. Reading on my phone does risk distraction from notifications or doom-scrolling, but the tradeoff is my current book is _always_ close to hand. I don't carve out specific times for reading, so having books on my phone means I am constantly reading in the between-times - on the train, waiting while someone ducks into a shop, etc. Over the years I've replaced a lot of my social media time with reading, which is how those dead times often get consumed. On occasion if I find myself opening some -scrolling app too often, I'll swap its location on my Home Screen with the Kindle app so my muscle memory takes me to a book instead of a news feed.
+
+So I read a lot. I'm so happy I've found a way to keep books in my life, even if I don't get to smell the paper. Because I got a Kindle a while back, that's where I started collecting books so that's the phone app I use for reading. In the Kindle app, I like the Reading Insights feature which tells you how many continuous days and weeks you've been reading for. I take pride in seeing how much I read, a nice little dopamine hit reminding me that I'm spending time on something worthwhile. I miss a day or three every now and then but I'm soon to pass 4 years of reading at least once a week, most of the time most days of the week. 
+
+<Media
+  src={`${mediaFolder}/streak.jpg`}
+  alt="Screenshot of current streak - 193 weeks continuous reading, 57 days continuous reading"
+  width={1170}
+  height={1055}
+/>
+
+But the longer it goes, the more the streak has started to feel like a burden. It's in silly ways, like deciding not to read a book because it's only available in Apple Books. I'd like to stop giving Amazon any of my money (we already don't order products from there) but I'm so attached to this reading streak.
+
+**It's hard to let it go.**
+
+I'm proud of it but I'm basing too much of my identity as a "person who reads books" on it. There's too much fear that losing the streak means I've given up reading somehow, and my completionist side feeling like those 4 years of reading have been a "waste". I need to make sure I'm focused on reading itself as the fundamental good, not keeping a streak for the sake of it or for imagined bragging rights. 
+
+My streak is no longer sparking joy, so it's time to thank it for its service and get rid of it. Once I crack 4 years (208 weeks) of reading, I'm going to let it lapse. Purposefully break from the Kindle app for at least a week so that counter resets. It'll be hard to see it go, but it's the right choice. 
+
+**Should I let it lapse now instead?** Why wait? Does cracking four years _really_ mean anything? That's still multiple months away. I would be interested to hear what you think.
+
+export default ({children}) => <Post {...data}>{children}</Post>

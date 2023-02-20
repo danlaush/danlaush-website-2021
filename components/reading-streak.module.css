@@ -1,0 +1,11 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.month {
+  line-height: 0;
+}
