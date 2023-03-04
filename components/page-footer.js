@@ -18,6 +18,9 @@ const PageFooter = ({ children, hasSidebar }) => (
         <p>
           <a className="link" href="https://www.linkedin.com/in/danlaush/">LinkedIn</a>
         </p>
+        <p>
+          <a className="link" href="/api/rss">RSS</a>
+        </p>
       </TwoUp>
     </Container>
   </footer>

@@ -69,7 +69,7 @@ const RootIndex = ({ roles, posts }) => {
           </ul>
         </TwoUp>
 
-        <TwoUp title="Web Log" subtitle={<Link href="/posts">View all</Link>}>
+        <TwoUp title="Web Log" subtitle={<><Link href="/posts">View all</Link> | <a href="/api/rss">RSS</a></>}>
           <ul className={styles.projectsList}>
             {posts.map(({title, slug, date}) => (
               <li key={slug}>
