@@ -1,19 +1,39 @@
-export default function handler(req, res) {
+import RSS from 'rss'
+import { parseISO, compareDesc } from "date-fns";
+import { listPosts } from "../../lib/api";
+
+const siteUrl = 'https://danlaush.biz'
+
+const feed = new RSS({
+  title: 'Dan Laush',
+  site_url: siteUrl,
+  feed_url: `${siteUrl}/api/rss`,
+})
+
+export default async function handler(req, res) {
   if (!res) {
     return;
   }
   // fetch your RSS data from somewhere here
+  const posts = await listPosts()
+  posts.sort(sortPostsByDate)
+  posts.forEach(post => {
+    feed.item({
+      title: post.title,
+      description: post.description,
+      url: `${siteUrl}/posts/${post.slug}`,
+      date: post.date,
+    })
+  })
+  console.log({posts})
   // const blogPosts = getRssXml(fetchMyPosts());
   res.setHeader("Content-Type", "text/xml");
-  res.write('<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">\
-  <channel>\
-      <title><![CDATA[Dan Laush]]></title>\
-      <description><![CDATA[Dan Laush]]></description>\
-      <link>https://danlaush.biz</link>\
-      <generator>RSS for Node</generator>\
-      <lastBuildDate>Sat, 04 Mar 2023 11:37:28 GMT</lastBuildDate>\
-      <atom:link href="https://danlaush.biz/feed.xml" rel="self" type="application/rss+xml"/>\
-  </channel>\
-</rss>');
+  res.write(feed.xml({ indent: true }));
   res.end();
+}
+
+function sortPostsByDate(a, b) {
+  const dateA = parseISO(a.date);
+  const dateB = parseISO(b.date);
+  return compareDesc(dateA, dateB);
 }

@@ -26,3 +26,8 @@ This project is deployed with Vercel. When code is merged into `main`, a webhook
   - This import statement makes it available to the MDXProvider scope.
 2. In `lib/customizeTOC`, add the text of the first heading in the blog post to the headings constant.
   - The only way I could find to programmatically toggle the ToC per page was this hook provided by `rehype-toc`, at which point it only has the tree of the current page available.
+
+## RSS
+
+https://stackoverflow.com/a/64385197
+https://dev.to/kendalmintcode/create-a-next-js-rss-feed-for-your-static-website-210p

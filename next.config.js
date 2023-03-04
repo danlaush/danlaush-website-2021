@@ -24,6 +24,11 @@ module.exports = withMDX({
         destination: "/",
         permanent: true,
       },
+      {
+        source: "/feed.xml",
+        destination: "/api/rss",
+        permanent: true,
+      }
     ];
   },
   pageExtensions: ['js', 'jsx', 'md', 'mdx']
