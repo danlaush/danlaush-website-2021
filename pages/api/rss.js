@@ -6,6 +6,7 @@ const siteUrl = 'https://danlaush.biz'
 
 const feed = new RSS({
   title: 'Dan Laush',
+  description: 'Personal blog, mostly tech with occasional other thoughts',
   site_url: siteUrl,
   feed_url: `${siteUrl}/api/rss`,
 })
@@ -25,8 +26,6 @@ export default async function handler(req, res) {
       date: post.date,
     })
   })
-  console.log({posts})
-  // const blogPosts = getRssXml(fetchMyPosts());
   res.setHeader("Content-Type", "text/xml");
   res.write(feed.xml({ indent: true }));
   res.end();

@@ -1,0 +1,55 @@
+import Post from '../../components/post';
+import TwoUp from '../../components/two-up';
+import { Media } from '../../components/media';
+
+export const mediaFolder = "/media/blog/shadow-values";
+
+export const data = {
+  title: "Shadow values",
+  date: "2023-03-04",
+  description: "Reflecting on the recent Wise rebrand",
+  media: `${mediaFolder}/share_landscape.png`
+}
+
+export default ({children}) => <Post {...data}>{children}</Post>
+
+<Media
+  src={`${mediaFolder}/new.png`}
+  alt="Screenshots of the redesigned Wise website, a bright and bold look"
+  width={2557}
+  height={1012}
+/> 
+
+> Context: On 1 Mar 2023, Wise [launched its new brand](https://wise.com/community/en/brand-new-look). Learn more about the [design system](https://wise.design/).
+
+We pride ourselves on our team autonomy. It's a way of working that gives us flexibility, the ability to experiment and iterate quickly with accountability for measurable goals.
+
+It's something we live and breathe in the small decisions we make every day. Whether it's written down or not, that makes it one of our values. 
+
+Values are the shortcuts we use when we make decisions - when you can, pick autonomy.
+
+We get good at working that way. We hire other people who work well that way. We get used to it because it works. Most of the time.
+
+Sometimes we can't pick autonomy. Sometimes, for particular things at particular times, everyone has to work in lockstep. We couldn't independently iterate the fundamentals of our visual identity with customers. We had to do this all at once, top to bottom and everyone together. Decidedly not autonomous, just like how in the past we couldn't "experiment" with an IPO or "iterate" on changing the name of the company.
+
+This is more challenging for us than some other companies. It's not in our DNA, because we've intentionally picked the other direction more of the time. It's the __shadow salue__ that comes along with autonomy. When you pick a value, you're making a choice, and that has consequences.
+
+<Media
+  src={`${mediaFolder}/old.png`}
+  alt="Screenshots of the old Wise website, a measured but well-worn look for a fintech"
+  width={2515}
+  height={1402}
+  caption="The now-retired brand"
+/> 
+
+That doesn't mean our choices were bad - we've gotten a lot out of autonomy over the years. But yeah, for us, in this process, it meant sometimes-overwhelming cross-team chaos. It meant mixed messages, and doubling work, and undoing or updating last minute what you thought was finalised.
+
+Even so, when the need arose everyone stepped up and got it done. We should be so proud of how smoothly this launch went, for all the challenges we've faced along the way.
+
+I even think our autonomy helped us hit this deadline. When we got down to brass tacks, when we'd made enough of the key decisions, our teams knew what they had to do. I've never seen the people around me so focused and productive as the last couple weeks. It was the point where we started saying "well, I know we don't have enough time to do this perfectly with every edge case and stakeholder considered so I'm going to make the best decision I can right now and come back to it later". And guess what - that's worked pretty well.
+
+We've plenty left to do. Staying focused on why we're here, [1bn down 180bn to go](https://newsroom.wise.com/en-UKI/223536-wise-unveils-new-look-as-it-reaches-16-million-customers-served-worldwide-and-continues-global-expansion) - but I'm resting easier knowing we can pull together when it's needed most.
+
+Well done to everyone who made this happen.
+
+Onwards.
