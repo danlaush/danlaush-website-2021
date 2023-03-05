@@ -2,12 +2,13 @@ import Post from '../../components/post.js';
 import { Media } from '../../components/media';
 import ReadingStreak from '../../components/reading-streak';
 
+export const mediaFolder = "/media/blog/reading-streak";
+
 export const data = {
   title: "My reading streak does not spark joy",
   date: "2023-02-19",
+  media: `${mediaFolder}/all.png`,
 }
-
-export const mediaFolder = "/media/reading-streak";
 
 <Media
   src={`${mediaFolder}/all.png`}

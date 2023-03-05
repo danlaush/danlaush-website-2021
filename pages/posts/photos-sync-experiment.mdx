@@ -2,14 +2,16 @@ import Post from '../../components/post.js';
 import { TableOfContents } from '../../components/table-of-contents';
 import { Media } from '../../components/media';
 
+export const mediaFolder = "/media/blog/photos-sync-experiment";
+
 export const data = {
   title: "Side Project Postmortem\: Google Photos API experiment",
   description: "In which the author learns to measure twice, cut once",
   date: "2022-11-06",
   featured: true,
+  media: `${mediaFolder}/vignette.jpg`,
 }
 
-export const mediaFolder = "/media/blog/photos-sync-experiment";
 
 export default ({children}) => <Post {...data}>{children}</Post>
 
