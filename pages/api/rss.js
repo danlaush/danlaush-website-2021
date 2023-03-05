@@ -19,12 +19,18 @@ export default async function handler(req, res) {
   const posts = await listPosts()
   posts.sort(sortPostsByDate)
   posts.forEach(post => {
-    feed.item({
+    const feedItem = {
       title: post.title,
       description: post.description,
       url: `${siteUrl}/posts/${post.slug}`,
       date: post.date,
-    })
+    }
+    if(post.media) {
+      feedItem.enclosure = {
+        'url'  : `https://danlaush.biz${post.media}`,
+      }
+    }
+    feed.item(feedItem)
   })
   res.setHeader("Content-Type", "text/xml");
   res.write(feed.xml({ indent: true }));
