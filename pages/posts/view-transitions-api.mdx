@@ -1,0 +1,38 @@
+import Post from '../../components/post';
+import TwoUp from '../../components/two-up';
+import { Media } from '../../components/media';
+
+export const mediaFolder = "/media/blog/view-transitions-api";
+
+export const data = {
+  title: "CSS-only page transitions with the View Transitions API for navigations",
+  date: "2023-03-14",
+  media: `${mediaFolder}/poster.png`,
+}
+
+export default ({children}) => <Post {...data}>{children}</Post>
+
+I played around with the super-experimental "View Transitions API for navigations" which enables **CSS-only transitions between pages**. This has no Javascript required whatsoever. Here's a video illustrating the effect, where I've used local overrides to add a `<style>` block to a few pages of wise.com and navigated between them with regular ol' `<a>` tags. 
+
+Note: This video is 25mb.
+
+<video poster={`${mediaFolder}/poster.png`} src={`${mediaFolder}/recording.mp4`} style={{maxWidth: '100%'}} controls />
+
+I've copy-pasted the transitions from [Jake Archibald's example page](https://deploy-preview-27--http203-playlist.netlify.app/) so they aren't exactly right for the use case, but the possibilities are exciting. You can see in this example how the nav animates independently from the rest of the page, so as long as we use consistent naming of certain global elements there is a lot of nice design signposting we can do with animation.
+
+This could be game changing for [Wise](https://wise.com/), enabling complex transitions between microservice frontends owned by different teams. We don't have one continuous client-side JavaScript app for the whole user experience. Teams deliver their features as independent Next.js apps, so users have full HTML page loads as they move been screens of the web app. View Transitions API for navigations lets our website feel much more like an app, in a manageable and low tech debt way.
+
+I'm excited about this but it seems to be a long way off. There's a [draft spec](https://drafts.csswg.org/css-view-transitions-1/) for the View Transitions API but it seems like that's all about the JavaScript part, supporting transitions in Single-Page Apps. The "for navigations" feature flag is what makes this possible for Multi-Page Apps but it's less documented.
+
+## Try it out
+
+1. Navigate to `chrome://flags/` and search for "view transitions". Enable both `viewTransition API` and `viewTransition API for navigations`. Relaunch your browser.
+2. Check that the changes have taken effect by visiting [Jake Archibald's example page](https://deploy-preview-27--http203-playlist.netlify.app/) and clicking around. You should observe the same animations in [Addy Osmani's Youtube video](https://www.youtube.com/watch?v=sQqnPXidEi8). 
+3. Download the 3 HTML files in <a href={`${mediaFolder}/test.zip`}>this zip file</a> and put them in a folder somewhere.
+4. Use [Chrome local overrides](https://developer.chrome.com/blog/new-in-devtools-65/#overrides) in dev tools with that folder. They're slightly modified versions of the original pages, with all the `<script>` tags removed and the new transition styles added in the page head.
+5. When in place, navigating to [wise.com](https://wise.com/) should respond with the `index.html` file from the downloaded folder, changing the headline to "Dan's test page".
+
+## Resources
+
+- https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API
+- https://developer.chrome.com/docs/web-platform/view-transitions/#changing-on-navigation-type
