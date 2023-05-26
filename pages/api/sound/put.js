@@ -3,13 +3,18 @@
  */
 import CF from '../../../lib/CF';
 
-export default async function get(req, res) {
+export default async function put(req, res) {
   try {
-    console.log('get a thing')
-    const key = req.query.key;
-    const data = await CF.get('another');
-    console.log('get', key, data)
+    const timestamp = Date.now();
+    const value = req.body.value;
     
+    console.log(JSON.stringify({
+      event: 'api - put',
+      timestamp,
+      value,
+    }))
+    const data = await CF.put(timestamp, value);
+    // why am I editing res directly, learn to use NextResponse properly
     res.status(200);
     res.json({success: true, errors: [], data })
   } catch (error) {
