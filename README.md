@@ -31,3 +31,21 @@ This project is deployed with Vercel. When code is merged into `main`, a webhook
 
 https://stackoverflow.com/a/64385197
 https://dev.to/kendalmintcode/create-a-next-js-rss-feed-for-your-static-website-210p
+
+## Sound project
+
+Journey of an interaction
+
+```mermaid
+flowchart TD;
+    a["Event handler | React component"]
+    -->b["Client-side api client | JS module"]
+    --browser/server boundary HTTP request
+    -->c["Next api route handler | Nextjs magic file"]
+    -->d["Server-side CF KV api client | JS module"]
+    --s2s http request
+    -->e["Cloudflare KV store | 3rd party"]
+
+```
+
+![](./docs/sound-handler-flowchart.png)

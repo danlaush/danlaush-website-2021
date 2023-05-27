@@ -1,52 +1,90 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import soundClient from '../../lib/sound-client';
+
+
+/**
+ * Recording
+ * location: {
+ *   lat,
+ *   long
+ * },
+ * 
+ * 
+ */
 
 const Sound = () => {
-  const [input, setInput] = useState('');
-  const handleGet = () => {
-    fetch("/api/sound/get?key=test", {
-      credentials: "same-origin",
-    })
-      .then(async res => {
-        console.log("i did it mom")
-        const {data} = await res.json()
-        const usp = new URLSearchParams(data);
-        for (const [key, value] of usp.entries()) {
-          console.log(key, value)
+  const [get, setGet] = useState("");
+  const [put, setPut] = useState("");
+  const [recordings, setRecordings] = useState([]);
+
+  useEffect(() => {
+    async function runEffect() {
+      await soundClient.getAll().then(async newList => {
+        try {
+          // Better to enqueue these somehow - if end up with too many,
+          // could crash? how elegant does browser handle? know that
+          // browser limits concurrent HTTP.
+          const allTheData = await Promise.all(newList.map(key => {
+            return soundClient.get(key.name).then(r => {
+              return {
+                ...r,
+                name: key.name
+              }
+            })
+          }))
+          setRecordings(allTheData.sort((a, b) => a.name > b.name));
+        } catch (error) {
+          console.log('error fetching all the data', error)
         }
       })
-      .catch((e) => console.log("oh no", e));
-  }
-  const handlePut = () => {
-    const formData = new URLSearchParams();
-    formData.append("metadata", JSON.stringify({location: 'test', qv: 3}));
-    formData.append("value", input);
+    }
+    runEffect();
+  }, []);
 
-    return fetch(
-      `/api/sound/put`,
-      {
-        credentials: "same-origin",
-        method: "PUT",
-        body: formData,
-      }
-    ).catch(async (err) => {
-      console.error("Error putting new key/value pair", err);
-    });
-
-  }
-  const handleSubmit = (event) => {
-    console.log("submitting", new Date());
-    fetch("/api/sound/get?key=test", {
-      credentials: "same-origin",
-    })
-      .then(() => console.log("i did it mom"))
-      .catch((e) => console.log("oh no", e));
+  const handleGet = async (key) => {
+    try {
+      await soundClient.get(key).then(res => {
+        console.log(res);
+        return res;
+      })
+    } catch (error) {
+      console.log("oh no", error)
+    }
   };
+  const handlePut = async () => {
+    const meta = { date: Date.now(), location: "test", qv: Math.random() };
+    try {
+      const res = await soundClient.put(put, meta)
+      console.log('success putting', put, res)
+    } catch (error) {
+      console.log("Error putting new key/value pair", error)
+    }
+  };
+  const nuke = async () => {
+    if(!confirm('are you sure? this cannot be undone')) return;
+
+    console.log('nuking all data')
+  }
   return (
     <main>
       <h1>Sound map</h1>
-      <button onClick={handleGet}>get</button>
-      <input value={input} onChange={e => setInput(e.target.value)} />
+      <input value={get} onChange={(e) => setGet(e.target.value)} />
+      <button onClick={() => handleGet(get)}>get</button>
+      <input value={put} onChange={(e) => setPut(e.target.value)} />
       <button onClick={handlePut}>put</button>
+      <button onClick={nuke}>delete all data</button>
+      {recordings.length === 0 ? (<p>Loading</p>) : null}
+      <ul>
+        {recordings.map((item) => (
+          <li key={item.name}>
+            {item.name}: {item.value}
+            <pre>
+              {JSON.stringify(item.metadata, null, 2)}
+            </pre>
+            
+          </li>
+        ))}
+      </ul>
     </main>
   );
 };
