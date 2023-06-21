@@ -1,0 +1,24 @@
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+import { TableOfContents } from '../../components/table-of-contents';
+
+export const data = {
+  title: "",
+  description: "",
+  date: "",
+}
+
+export const mediaFolder = "/media/blog/";
+
+## Heading
+
+Test
+
+<Media
+  src={`${mediaFolder}/image.png`}
+  alt=""
+  width={}
+  height={}
+/>
+
+export default ({children}) => <Post {...data}>{children}</Post>
