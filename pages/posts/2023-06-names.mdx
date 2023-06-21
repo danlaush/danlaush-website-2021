@@ -1,0 +1,65 @@
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+import { TableOfContents } from '../../components/table-of-contents';
+
+export const mediaFolder = "/media/blog/2023-06-names";
+
+export const data = {
+  title: "Privacy-conscious facial recognition AR with social media?",
+  description: "\"If only I could remember people's names, I would be the most powerful person on earth.\" - Nilay Patel, Editor-in-chief of The Verge",
+  date: "2023-06-21",
+  media: `${mediaFolder}/google-glass.jpg`,
+}
+
+<Media
+  src={`${mediaFolder}/google-glass.jpg`}
+  alt="A person wearing Google Glass AR headset"
+  width={1027}
+  height={572}
+/>
+
+An oft-repeated maxim on [The Vergecast](https://www.theverge.com/the-vergecast), Nilay has commented that the true killer app for augmented reality is being able to look at someone and know their name. The followup quip is that this would require a global facial recognition database, a privacy nightmare beyond compare. I tend to agree on both counts - everything I've seen so far from AR is niche where this might have legs, but I can't think of a single body on earth I'd trust to run a system like this.
+
+> **Context:** I'm fascinated by wearable tech. I don't want to put a chip under my skin, but I love thinking about the future of human-computer interaction and how we can be more engaged with the real world.
+
+Nilay's idea got me wondering. Can we make any progress on this problem? I have a **narrow and somewhat silly use case** which might be a step in that direction.
+
+```
+Scene: a "networking event" with "industry people"
+Person A: "oh hey Dan it's been a while, I hope you've been doing well"
+Me: *panics*
+Me: *remembers I'm wearing Google Glass, blinks to show names*
+Me: "oh hey Chris Christopherson it's good to see you"
+```
+
+I'm not a networking event person, but for people who are, they probably have quite a large network on LinkedIn. LinkedIn, home of the high-quality direct-face-on be-suited professional profile photo, ideal for AI tooling to compare faces from a camera feed against.
+
+Can I **download the profile photos of people in my own personal LinkedIn network** to my own personal device and use my own personal machine learning to figure out who this person is? We can do a fair amount of ML work directly on devices now, so you wouldn't need to participate in the feared global facial recognition database.
+
+Benefits of this approach
+- I have permission for all the data (previously established LI connection)
+- Facial recognition not centrally managed
+- No network lag
+
+Holes in this approach
+- Have to be connected with the person already, limited utility[^1]
+- More difficult to match based on one photo
+- Other social media networks don't have such a strong standard of profile photo - facebook and instagram would have much lower quality data, limiting the reach of this social media profile approach
+- What device can this run on? Google Glass is effectively dead, and what, you're gonna walk around an event with your phone camera out?
+
+**Helping hustlers hustle isn't exactly saving the world**. In fact, for the networking event case just ask people to wear name tags and problem solved - using AR is the most over-engineered solution I can imagine. But I'm more curious whether this on-device people-whose-photos-I-can-access system could be useful in other ways.
+
+- Public figures? Don't want to download a picture of every human in the public record, but what if you wanted to watch the Oscars and remember who everyone is?
+- Meet someone at an event, (with their permission) take a photo with the glasses and add them to my own personal, private, local facial recognition database
+- Some people really struggle to put names to faces - could this be useful for a medical niche, like the extremely neurodivergent or people with brain trauma?
+
+Realistically, the utility of this is a ways off. I haven't actually built this, if you read this hoping to find a download link. Even if I wanted to make a prototype using a phone camera there's too many new things I'd need to learn for it to be a good side project.[^2] There's definitely prior art in on-device facial recognition that someone else should extend with a "Log in with LinkedIn" button. Let me know if you do something like this!
+
+Thanks for reading.
+
+<small>Photo credit <a href="https://commons.wikimedia.org/wiki/File:Google_Glass_detail_%28cropped%29.jpg">Wikimedia Commons</a></small>
+
+[^1]: Events sometimes share the (opted-in) contact details of people in advance of an event, sometimes through LinkedIn groups, so you might be able to build that digital network before you've actually met people
+[^2]: I got some good advice once that for a good side project in tech you should limit yourself to one new thing at a time, or you risk burning out on the idea before your dream comes to life. I'd need to learn mobile dev and AI which are entire careers on their own. :joy: Even if I stuck to web, I'd need want to implement with worker threads and robust use of localStorage so it's A Lot for a brain fart.
+
+export default ({children}) => <Post {...data}>{children}</Post>
