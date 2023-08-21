@@ -1,11 +1,19 @@
 [
   {
+    "id": "wise", 
+    "organisation": "Wise (formerly TransferWise)",
+    "entryTitle": "Engineering lead",
+    "url": "https://wise.com",
+    "startDate": "2021-06",
+    "endDate": ""
+  },
+  {
     "id": "transferwise", 
     "organisation": "TransferWise",
     "entryTitle": "Senior front-end developer",
     "url": "https://transferwise.com",
     "startDate": "2019-09",
-    "endDate": ""
+    "endDate": "2021-06"
   },
   {
     "id": "today", 

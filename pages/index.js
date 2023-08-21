@@ -26,48 +26,6 @@ const RootIndex = ({ roles, posts }) => {
         <meta name="description" content="I build things for people." />
       </Head>
       <Container>
-        <TwoUp title="Work">
-          <ul className={styles.projectsList}>
-            <li>
-              <Link href="/projects/lienzo" className="link">
-                TransferWise CMS refresh
-              </Link>
-              <p className={styles.projectsListMeta}>
-                JavaScript, Next.js, React <span>2020</span>
-              </p>
-            </li>
-            <li>
-              <Link href="/projects/our-watch" className="link">
-                Our Watch
-              </Link>
-              <p className={styles.projectsListMeta}>
-                JavaScript, Vue, WordPress, Static site <span>2019</span>
-              </p>
-            </li>
-            <li>
-              <Link href="/projects/worksafe" className="link">
-                WorkSafe
-              </Link>
-              <p className={styles.projectsListMeta}>
-                JavaScript, Vue, Drupal <span>2018</span>
-              </p>
-            </li>
-            <li>
-              <Link href="/projects/side-projects" className="link">
-                Side projects
-              </Link>
-              <p className={styles.projectsListMeta}>
-                JavaScript <span>2018</span>
-              </p>
-            </li>
-            <li>
-              <Link href="/projects/talks" className="link">
-                Talks
-              </Link>
-              <p className={styles.projectsListMeta}>Public speaking</p>
-            </li>
-          </ul>
-        </TwoUp>
 
         <TwoUp title="Web Log" subtitle={<><Link href="/posts">View all</Link> | <a href="/api/rss">RSS</a></>}>
           <ul className={styles.projectsList}>
@@ -117,6 +75,49 @@ const RootIndex = ({ roles, posts }) => {
           )}
           <h3>See complete resume</h3>
           <a href="/Laush-resume.pdf">Download full history (PDF)</a>
+        </TwoUp>
+        
+        <TwoUp title="Work">
+          <ul className={styles.projectsList}>
+            <li>
+              <Link href="/projects/lienzo" className="link">
+                TransferWise CMS refresh
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript, Next.js, React <span>2020</span>
+              </p>
+            </li>
+            <li>
+              <Link href="/projects/our-watch" className="link">
+                Our Watch
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript, Vue, WordPress, Static site <span>2019</span>
+              </p>
+            </li>
+            <li>
+              <Link href="/projects/worksafe" className="link">
+                WorkSafe
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript, Vue, Drupal <span>2018</span>
+              </p>
+            </li>
+            <li>
+              <Link href="/projects/side-projects" className="link">
+                Side projects
+              </Link>
+              <p className={styles.projectsListMeta}>
+                JavaScript <span>2018</span>
+              </p>
+            </li>
+            <li>
+              <Link href="/projects/talks" className="link">
+                Talks
+              </Link>
+              <p className={styles.projectsListMeta}>Public speaking</p>
+            </li>
+          </ul>
         </TwoUp>
       </Container>
     </Layout>
