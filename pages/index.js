@@ -76,8 +76,8 @@ const RootIndex = ({ roles, posts }) => {
           <h3>See complete resume</h3>
           <a href="/Laush-resume.pdf">Download full history (PDF)</a>
         </TwoUp>
-        
-        <TwoUp title="Work">
+
+        <TwoUp title="Projects">
           <ul className={styles.projectsList}>
             <li>
               <Link href="/projects/lienzo" className="link">
