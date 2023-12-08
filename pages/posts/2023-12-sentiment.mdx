@@ -1,0 +1,157 @@
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+import { TableOfContents } from '../../components/table-of-contents';
+
+export const mediaFolder = "/media/blog/2023-12-sentiment";
+
+export const data = {
+  title: "How angry is Reddit today",
+  description: "A UI experiment with sentiment analysis using Cloudflare Workers AI",
+  date: "2023-12-08",
+  media: `${mediaFolder}/desktop-start.png`,
+}
+
+<Media
+  src={`${mediaFolder}/desktop-start.png`}
+  alt="A screenshot of the applet, a form prompting the user for a subreddit"
+  width={2940}
+  height={1912}
+/>
+
+<div style={{display: 'flex', justifyContent: 'center'}}><a href="https://twitter-sentiment.dan-laush.workers.dev/">Try it out</a> 🚀</div>
+
+When I check the weather, I get simple heuristics to help me understand the forecast for the day. Since online conversations can be toxic, could I make something similar for online communities? Take the temperature, read the room before engaging. I think this is inspired by Dave Rupert mentioning something to this effect on the Shop Talk Show podcast.
+
+I thought that "sentiment analysis" might help me: machine learning models which are given a body of text and return the prevailing emotion. Cloudflare recently made machine learning models available in its Worker functions, which was finally the level of abstraction I needed to try this out.
+
+- Background
+- Design and UI
+- Server
+- AI
+
+## Background
+
+The original idea was to connect this to Twitter. How angry is a given hashtag? Hashtags demarcate conversations, and are interesting because they pop up organically. Some hashtags are long-standing communities (#auspol), where others become popular for a time like for current events (#AFLWGF, Australian-rules football's women's league Grand Final). Even Twitter addicts can't always know where the conversation will take place for the day, who you'll meet there, and what you'll talk about. Since these conversations can be toxic and unhealthy, it would be helpful to know how spicy the chat is before choosing to join in. 
+
+Unfortunately Twitter later made their API prohibitively expensive, so I pivoted to look at reddit communities where the API is still free.
+
+I'm not an AI developer. I'm a frontend developer, my priorities are building good user experiences. I want to engage with AI, but I don't see myself training my own model from scratch or really even wanting to manage a server running a model for me. I want to query one that someone else is doing the heavy lifting of managing, so I can focus on how it's used.
+
+## Design and UI
+
+I'd call this wireframe-level design. I like the bold background colour and simple message in the middle of the screen—that was the core of my UI idea. The supplementary indicator progress bar at the top was added later and needs further treatment, but is important for the colourblind and useful for all users; the colour gradient can be subtle.
+
+Big-and-bold user-generated content can be tricky. Long words like `programming` don't fit horizontally on one line in mobile. What's the best design solution for that case? Dynamically shrink the text? Or just leave it?
+
+The table could be more mobile-friendly - the "Assessment" and "Confidence" columns are good candidates for a visual treatment (icon, colour), which would leave more space for text giving a more readable line length.
+
+I do like my budget loading spinner.<span style={{display: 'inline-block', animation: 'rotation 2s infinite linear', marginLeft: '1em'}}>`@`</span>
+
+## Server
+Serverless technologies and the normalisation of Node.js services have made it easier for me to set up backends easily, if you follow the common patterns. Cloudflare's Worker tech lets me run some arbitrary javascript on a server on-demand (and at the edge!), instead of needing to manage my own server box to be online at all times.
+
+For this project I used Cloudflare's <a href="https://developers.cloudflare.com/workers/get-started/guide/">Wrangler dev tools</a>, which was easy since the whole project was built with that. If I wanted to use Workers in an existing project I'd have to learn more to integrate the features. I think you'd have to do a lot manually. The `wrangler.toml` configuration file has some magic in it.
+
+In the end, I have a javascript file on my machine that I can `pnpm start` and trigger at a URL.
+
+```
+|- public
+||-- index.css
+||-- index.html
+|- src
+||-- index.js
+|- .dev.vars
+|- package.json
+|- wrangler.toml
+```
+
+Other tools:
+- https://hono.dev/ server to set up some basic routes in the worker file, so I can pass requests for URLs to specific files or functions
+- https://preactjs.com/ for a single-page single-file no-build frontend application, all stored in `index.html`. It could be better organised but for a proof of concept I love that I can make a reasonably sensible application including a JSX-like language with no build whatsoever
+- Workers AI to query a machine learning model, see more below
+
+```json
+// package.json
+{
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev --remote"
+  },
+  "devDependencies": {
+    "wrangler": "^3.17.1"
+  },
+  "dependencies": {
+    "@cloudflare/ai": "^1.0.38",
+    "hono": "^3.7.2"
+  }
+}
+```
+
+```js
+// index.js
+app.get('/', serveStatic({ path: './index.html' }));
+app.get('/sentiment', async ({req, env}) => {
+    console.log('fetch some data from reddit')
+	console.log('do an AI on it')
+})
+```
+
+```html
+<!-- index.html -->
+<body>
+<script type="module">
+	import { h, render }
+		from 'https://cdn.skypack.dev/preact';
+	import { useState, useEffect }
+		from 'https://cdn.skypack.dev/preact/hooks';
+	import htm from 'https://cdn.skypack.dev/htm';
+	const html = htm.bind(h);
+
+	function App (props) {
+		const [search, setSearch] = useState('CasualUK')
+		const changeHandler = (event) => {
+			setSearch(event.target.value)
+		}
+		return html`
+			<input type="text"
+				value=${search} 
+				onChange=${changeHandler} />
+		`
+	}
+	render(html`<${App} />`, document.body);
+</script>
+</body>
+```
+## AI
+This is the sum total of the machine learning used in this app.
+```js
+const analyzed = await Promise.all(toAnalyze.map(comment => {
+	return ai.run('@cf/huggingface/distilbert-sst-2-int8', {
+		text: comment
+	}).then(res => restructureSentiment(res, comment))
+}))
+```
+
+Specify a model and query, get a response. <a href="https://developers.cloudflare.com/workers-ai/">Workers AI</a> is still under development, and I had some things change out from under me mid-project, but the core simplicity is there. Cloudflare takes care of having a machine running the ML model available. I tried this project once in the past when Azure made ML-ready boxes available to spin up, but even that was too low-level for me to feel confident with.
+
+Workers AI wasn't always the fastest, especially since I was passing it many comments to analyse at once. Usually in the 10-20 second range. I had to scale it back to work in the free tier - each run of the worker could only trigger 50 maximum concurrent "actions", so analysing 100 separate comments in one subreddit was too much. Perhaps I could have joined many comments together into one sentiment analysis, but that felt like it would give less accurate results.
+	I should cache the results of an analysis and surface these to new visitors, so they can jump to one and see how the app should work.
+
+The **Distillbert** machine learning model specialises in sentiment analysis. Provided text is labeled as "POSITIVE" or "NEGATIVE", with a percentage level of confidence in the label. ("80% sure this text is positive", "100% confident this is a negative text"). 
+
+This model ended up being... I'll say "**not fit for purpose**" for my UI idea. 
+
+For starters, the page heading is "how angry is". Negative text has some correlation with anger, but do the results actually say what the UI implies? Besides, the positive/negative pronouncements were often not very good: 45% of the comments I pulled from `/r/dogs` were labeled NEGATIVE. Really? (see screenshot)
+
+<Media
+  src={`${mediaFolder}/explanation.png`}
+  alt="Justification for a sentiment analysis, a list of comments and their positive or negative label. It's not very accurate."
+  width={1260}
+  height={1612}
+/>
+
+## Final thoughts
+
+This was a fun tinker. I don't think this particular applet has legs, but I think there are some good UX goals that AI can help us with. Wrangler did make it easy to work with Cloudflare tech, and while Workers AI was a bit flaky and underdocumented I hope development of it continues.
+
+export default ({children}) => <Post {...data}>{children}</Post>
