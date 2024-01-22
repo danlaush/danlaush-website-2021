@@ -1,0 +1,128 @@
+import Post from '../../components/post.js';
+import { Media } from '../../components/media';
+import Link from "next/link";
+
+export const mediaFolder = "/media/blog/2024-01-prototypes";
+
+export const data = {
+  title: "How I keep my frontend prototypes simple",
+  description: "4 things I do to get ideas online quickly",
+  date: "2024-01-22",
+  media: `${mediaFolder}/screenshot.png`,
+}
+
+<Media
+  src={`${mediaFolder}/hero.png`}
+  alt="Screenshots of a few experiments"
+  width={872}
+  height={531}
+  caption="A few experiments - the Twitch Wall, Reddit Sentiment, and Baker Street game helper"
+/>
+
+I like to tinker on the web. I have little ideas for web experiences and it's fun to quickly put the skeleton together with a minimum of fuss. I get frustrated with the cruft of modern web development, so I aim for the smallest amount of tooling I can get away with for the features that I need. I'm so tired of coming back to a project 2 years later to find nothing works anymore.  Turns out you can do a lot with modern CSS and Javascript.
+
+tl;dr:
+- Custom CSS, no preprocessor
+- No-build Preact with JSX in the browser
+- ES Modules from CDN esm.sh
+- Deployed to Vercel, optional Serverless Functions
+
+## Custom CSS, no preprocessor
+
+I've worked with and liked many CSS frameworks over the years, but for my personal prototypes I tend to not use any pre-written CSS. Since many of these prototypes are one or two screens, including an entire UI library has always felt like overkill.
+
+I like to work at wireframe-level design quality, where the boxes are in the right place but it's intentionally low fidelity so the user isn't under the assumption that this is the perfect implementation of the idea. I write the sensible layout styles and basic or key visual elements, like a demonstrative background colour or borders to differentiate sections. I start with an empty `styles.css` and add exactly what's needed. 
+
+This also means I don't use preprocessors, which eliminates another source of fragility. No build step = no problem. CSS Custom Properties and CSS Grid have eliminated my major needs for preprocessors and UI libraries. Does this solution scale? Not necessarily, but again for these prototypes I don't expect them to.
+
+```css
+/* 
+ * sentiment analysis app
+ * https://twitter-sentiment.dan-laush.workers.dev/
+ * https://github.com/danlaush/twitter-sentiment/
+ */
+:root {
+  --hue: 300; /* updates by JS */
+  --background: hsl(var(--hue), 80%, 50%);
+  --hero-font-color: white;
+}
+
+#analysis {
+  background-color: var(--background);
+  transition: background-color 1s;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--hero-font-color);
+}
+```
+
+Examples: 
+- [twitch-wall/styles.css](https://github.com/danlaush/twitch-wall/blob/master/public/styles.css)
+- [reddit-sentiment/styles.css](https://github.com/danlaush/twitter-sentiment/blob/master/public/index.css)
+- [holmes-app/styles.css](https://github.com/danlaush/holmes/blob/main/styles.css)
+
+## No-build Preact with JSX in the browser
+
+My last few years of professional work have been in React, so the paradigms there are familiar to me. It has plenty of foibles, but for my experiments I want to get my idea out of my head as quickly as possible so I'm happy to use those patterns to manage state and respond to changes.
+
+I want to avoid a build process. `create-react-app` sets you up with hundreds of `node_modules`, most of which I don't care about for a prototype.
+
+Preact with `htm` [has me covered](https://preactjs.com/guide/v10/getting-started#no-build-tools-route). The combined payload, including the added Hooks module, is single-digit kilobytes (<10kb). With a few lines of javascript I can manage state and express a UI with a near-equivalent of JSX. 
+
+```js
+// this runs in the browser, no build/compile step!
+// keep reading to learn about imports
+function App (props) {
+	const [streams, setStreams] = useState([])
+	useEffect(() => { /* fetch and set streams */}, [])
+	return html`
+		<ul>
+			${streams.map(s => html`<li>${s.user_name}</li>`)}
+		</ul>
+	`
+}
+render(html`<${App} />`, document.body);
+```
+
+Examples: 
+- [twitch-wall/index.js](https://github.com/danlaush/twitch-wall/blob/master/public/index.js)
+- [reddit-sentiment/index.html](https://github.com/danlaush/twitter-sentiment/blob/master/public/index.html)
+- [holmes-app/index.js](https://github.com/danlaush/holmes/blob/main/index.js)
+
+### Why a framework?
+
+It would be possible to write markup directly into an `.html` file, then use Javascript to control interactivity. Some of my experiments work that way, for a while. But usually quite quickly I run into a situation where I want to programmatically add or remove blocks of HTML on the page, and modern component-based development in Javascript works so well for that. It's so nice to manage state and let the HTML declaratively reflect that data.
+
+## ES Modules from CDN esm.sh
+
+In a further commitment to a low-tooling setup, instead of installing node modules into the project I get modules at runtime in the browser. https://esm.sh provides all of NPM as ES Modules-friendly URLs. Because ES Modules have reliable browser support, I don't need to bundle or package the Javascript any particular way. 
+
+```js
+import { h, Component, Fragment, render } from 'https://esm.sh/preact';
+import { useState, useEffect, useRef } from 'https://esm.sh/preact/hooks';
+import htm from 'https://esm.sh/htm';
+```
+
+This works mostly well. Not every package is totally ESM/browser-friendly. esm.sh does some work to make CommonJS packages work as ES Modules, but I've run into some cases where I just couldn't get things to work because a package expected to be used in a Node/NPM/bundled way. 
+
+`importmaps` are now supported in all major browsers so if I really wanted I could shorthand imports to look more like an NPM project (`import Preact from 'preact'`), but I usually don't have too many files so that hasn't felt necessary.
+
+## Deployed to Vercel, optional Serverless Functions
+
+I'm not married to this platform, but Vercel has been Good Enough for what I've needed (and free). Some of my projects are purely static so hosting on Vercel could be considered overkill, but setting things up is easy and free. Static files in a `/public` folder are immediately 
+
+Some of my experiments develop the need for a backend partway through and it's easy enough to add a Serverless Function for the minimal processing required. 
+
+<Media
+  src={`${mediaFolder}/vercel.png`}
+  alt="A side-by-side screenshot of the empty/default Vercel config and the Github folder view, highlighting the matching folder names"
+  width={1522}
+  height={1488}
+  caption="Vercel config is left as the defaults (note the lack of install/build step!), and the `/api` folder is automagically deployed as Serverless Functions"
+/>
+
+One exception to this was the <Link href="/posts/2023-12-sentiment">Reddit Sentiment project</Link>, which used Cloudflare's AI Workers and their Wrangler dev tools. That was more complicated but was required to use the Workers AI.
+
+export default ({children}) => <Post {...data}>{children}</Post>
